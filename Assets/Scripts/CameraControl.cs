@@ -36,7 +36,7 @@ public class CameraControl : MonoBehaviour {
 			if(pre.y <=-1) pre.y = Input.mousePosition.y;
 			rot.x -= (Input.mousePosition.y-pre.y)*rotVelocity;
 			if(rot.x>90) rot.x =90;
-			else if(rot.x<5) rot.x =5;
+			else if(rot.x<2) rot.x =2;
 			pre.y = Input.mousePosition.y;
 		}/*
 		else if(Input.GetMouseButton(1)) {
