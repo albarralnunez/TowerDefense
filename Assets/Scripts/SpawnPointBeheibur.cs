@@ -3,9 +3,11 @@ using System.Collections;
 
 public class SpawnPointBeheibur : MonoBehaviour {
 
+	public int minions;
+
 	// Use this for initialization
 	void Start () {
-		InvokeRepeating("Spawn", 5,5);
+		InvokeRepeating("Spawn", minions,minions);
 	}
 
 	// Update is called once per frame

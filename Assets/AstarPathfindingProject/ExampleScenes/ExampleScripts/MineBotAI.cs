@@ -21,7 +21,9 @@ namespace Pathfinding {
 	 */
 	[RequireComponent(typeof(Seeker))]
 	public class MineBotAI : AIPath {
-		
+
+		enum States {fight,walk};
+
 		/** Animation component.
 		 * Should hold animations "awake" and "forward"
 		 */
@@ -36,9 +38,16 @@ namespace Pathfinding {
 		/** Effect which will be instantiated when end of path is reached.
 		 * \see OnTargetReached */
 		public GameObject endOfPathEffect;
-		
+		public int statep;
+
+		public void SetToFight() {
+			statep = (int)States.fight;
+		}
+
 		public new void Start () {
-			
+
+			statep = (int)States.walk;
+
 			//Prioritize the walking animation
 			anim["forward"].layer = 10;
 			
@@ -70,6 +79,9 @@ namespace Pathfinding {
 				GameObject.Instantiate (endOfPathEffect,tr.position,tr.rotation);
 				lastTarget = tr.position;
 			}
+			Toolbox toolbox = Toolbox.Instance;
+			toolbox.EnemyBusy.Remove (gameObject.GetInstanceID ());
+			Destroy (gameObject);
 		}	
 
 		public override Vector3 GetFeetPosition ()
@@ -100,58 +112,67 @@ namespace Pathfinding {
 			}
 			return nearestObj;
 		}
-
+		int asdf = 0;
 		protected new void Update () {
-			//target = GetNearestTaggedObject ();
-			//Get velocity in world-space
-			Vector3 velocity;
-			if (canMove) {
-			
-				//Calculate desired velocity
-				Vector3 dir = CalculateVelocity (GetFeetPosition());
+			if (statep == (int)States.walk) {
+				target = GameObject.Find("Target").transform;
+				//Get velocity in world-space
+				Vector3 velocity;
+				if (canMove) {
 				
-				//Rotate towards targetDirection (filled in by CalculateVelocity)
-				RotateTowards (targetDirection);
-				
-				dir.y = 0;
-				if (dir.sqrMagnitude > sleepVelocity*sleepVelocity) {
-					//If the velocity is large enough, move
-				} else {
-					//Otherwise, just stand still (this ensures gravity is applied)
-					dir = Vector3.zero;
+					//Calculate desired velocity
+					Vector3 dir = CalculateVelocity (GetFeetPosition ());
+
+					//Rotate towards targetDirection (filled in by CalculateVelocity)
+					RotateTowards (targetDirection);
+
+					dir.y = 0;
+					if (dir.sqrMagnitude > sleepVelocity * sleepVelocity) {
+							//If the velocity is large enough, move
+					} else {
+							//Otherwise, just stand still (this ensures gravity is applied)
+							dir = Vector3.zero;
+					}
+
+					if (navController != null) {
+					} else if (controller != null)
+							controller.SimpleMove (dir);
+					else
+							Debug.LogWarning ("No NavmeshController or CharacterController attached to GameObject");
+
+					velocity = controller.velocity;
+					} else {
+							velocity = Vector3.zero;
+					}
+					//Animation
+
+					//Calculate the velocity relative to this transform's orientation
+					Vector3 relVelocity = tr.InverseTransformDirection (velocity);
+					relVelocity.y = 0;
+
+					if (velocity.sqrMagnitude <= sleepVelocity * sleepVelocity) {
+							//Fade out walking animation
+							anim.Blend ("forward", 0, 0.2F);
+					} else {
+							//Fade in walking animation
+							anim.Blend ("forward", 1, 0.2F);
+
+							//Modify animation speed to match velocity
+							AnimationState state = anim ["forward"];
+
+							float speed = relVelocity.z;
+							state.speed = speed * animationSpeed;
+					}
+
+				} else if (statep == (int)States.fight) {
+					++asdf;
+					if (asdf == 600) {
+						Toolbox toolbox = Toolbox.Instance;
+						toolbox.EnemyBusy.Remove (gameObject.GetInstanceID ());
+						Destroy(gameObject);
+						
+					}
 				}
-				
-				if (navController != null) {
-				} else if (controller != null)
-					controller.SimpleMove (dir);
-				else
-					Debug.LogWarning ("No NavmeshController or CharacterController attached to GameObject");
-				
-				velocity = controller.velocity;
-			} else {
-				velocity = Vector3.zero;
-			}
-			
-			
-			//Animation
-			
-			//Calculate the velocity relative to this transform's orientation
-			Vector3 relVelocity = tr.InverseTransformDirection (velocity);
-			relVelocity.y = 0;
-			
-			if (velocity.sqrMagnitude <= sleepVelocity*sleepVelocity) {
-				//Fade out walking animation
-				anim.Blend ("forward",0,0.2F);
-			} else {
-				//Fade in walking animation
-				anim.Blend ("forward",1,0.2F);
-				
-				//Modify animation speed to match velocity
-				AnimationState state = anim["forward"];
-				
-				float speed = relVelocity.z;
-				state.speed = speed*animationSpeed;
-			}
 		}
 	}
 }
