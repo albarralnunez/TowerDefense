@@ -29,18 +29,28 @@ namespace Pathfinding {
 		private Transform defPosition;
 
 		public GameObject selectionHighlight;
+		public GameObject defenseHighlight;
 
+		
 		public void setHighlight(bool active) {
 			selectionHighlight.SetActive(active);
+			defenseHighlight.SetActive(active);
 		}
 
 		public new void Start () {
 			selectionHighlight = 
-				(GameObject)Instantiate (Resources.Load ("Highlight"), gameObject.transform.position, gameObject.transform.rotation);
-			selectionHighlight.transform.parent = gameObject.transform;
+				(GameObject)Instantiate (Resources.Load ("Highlight"), gameObject.transform.position, Quaternion.identity);
+			selectionHighlight.transform.parent = transform;
+			//selectionHighlight.renderer.sharedMaterial.color = Color.blue;
 			selectionHighlight.transform.localScale = new Vector3(15, 1, 15);
 			selectionHighlight.SetActive(false);
 
+			defenseHighlight = 
+				(GameObject)Instantiate (Resources.Load ("HighlightDef"), transform.parent.Find ("defPos").transform.position,Quaternion.identity);
+			defenseHighlight.transform.parent = transform.parent.Find ("defPos");
+			//defenseHighlight.renderer.sharedMaterial.color = Color.green;
+			defenseHighlight.transform.localScale = new Vector3(3, 1, 3);
+			defenseHighlight.SetActive(false);
 			//Prioritize the walking animation
 			anim["forward"].layer = 10;
 			
