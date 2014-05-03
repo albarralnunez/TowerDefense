@@ -5,7 +5,6 @@ using System;
 
 namespace Pathfinding {
 	[RequireComponent(typeof(Seeker))]
-
 	public class SoldierAI : AIPath {
 		enum State {fight,wait,walk};
 			
@@ -16,10 +15,10 @@ namespace Pathfinding {
 		public float distanceAlert = 200.0F;
 		/** Minimum velocity for moving */
 		public float sleepVelocity = 0.4F;
-		
+
 		/** Speed relative to velocity with which to play animations */
 		public float animationSpeed = 0.2F;
-		
+
 		/** Effect which will be instantiated when end of path is reached.
 		 * \see OnTargetReached */
 		public GameObject endOfPathEffect;
@@ -29,9 +28,18 @@ namespace Pathfinding {
 		private GameObject targetObj;
 		private Transform defPosition;
 
-		public new void Start () {
+		public GameObject selectionHighlight;
 
-			defPosition = transform.parent.Find("defPos").transform;
+		public void setHighlight(bool active) {
+			selectionHighlight.SetActive(active);
+		}
+
+		public new void Start () {
+			selectionHighlight = 
+				(GameObject)Instantiate (Resources.Load ("Highlight"), gameObject.transform.position, gameObject.transform.rotation);
+			selectionHighlight.transform.parent = gameObject.transform;
+			selectionHighlight.transform.localScale = new Vector3(15, 1, 15);
+			selectionHighlight.SetActive(false);
 
 			//Prioritize the walking animation
 			anim["forward"].layer = 10;
@@ -47,10 +55,10 @@ namespace Pathfinding {
 			//Call Start in base script (AIPath)
 			base.Start ();
 		}
-		
+
 		/** Point for the last spawn of #endOfPathEffect */
 		protected Vector3 lastTarget;
-		
+
 		/**
 		 * Called when the end of path has been reached.
 		 * An effect (#endOfPathEffect) is spawned when this function is called
@@ -69,6 +77,7 @@ namespace Pathfinding {
 		{
 			return tr.position;
 		}
+
 		private GameObject GetNearestTaggedObject(){
 			// and finally the actual process for finding the nearest object:
 			
@@ -95,52 +104,52 @@ namespace Pathfinding {
 		protected new void Update () {
 			if (state == (int)State.wait) {
 				if (!hunting) {
-						targetObj = GetNearestTaggedObject ();
-						if (defPosition != gameObject.transform && targetObj == null)
-								defPosition = transform.parent.Find ("defPos").transform;
-						//GameObject.Find("Soldier/defPos").GetComponent<Transform>().transform;
-						target = defPosition;
+					targetObj = GetNearestTaggedObject ();
+					if (defPosition != gameObject.transform && targetObj == null)
+							defPosition = transform.parent.Find ("defPos").transform;
+					//GameObject.Find("Soldier/defPos").GetComponent<Transform>().transform;
+					target = defPosition;
 				} else {
-						if (targetObj != null) {
-								target = targetObj.transform;
-							float distanceSqr = (target.position - transform.position).sqrMagnitude;
-							if (distanceSqr < 5) {
-								state = (int)State.fight;
-								targetObj.GetComponent<Pathfinding.MineBotAI>().SetToFight();
-							}
-						} else {
-							hunting = false;
-							target = defPosition;
+					if (targetObj != null) {
+						target = targetObj.transform;
+						float distanceSqr = (target.position - transform.position).sqrMagnitude;
+						if (distanceSqr < 5) {
+							state = (int)State.fight;
+							targetObj.GetComponent<Pathfinding.MineBotAI> ().SetToFight ();
 						}
+					} else {
+						hunting = false;
+						target = defPosition;
+					}
 				}
 
 				//Get velocity in world-space
 				Vector3 velocity;
 				if (canMove) {
 
-						//Calculate desired velocity
-						Vector3 dir = CalculateVelocity (GetFeetPosition ());
+					//Calculate desired velocity
+					Vector3 dir = CalculateVelocity (GetFeetPosition ());
 
-						//Rotate towards targetDirection (filled in by CalculateVelocity)
-						RotateTowards (targetDirection);
+					//Rotate towards targetDirection (filled in by CalculateVelocity)
+					RotateTowards (targetDirection);
 
-						dir.y = 0;
-						if (dir.sqrMagnitude > sleepVelocity * sleepVelocity) {
-								//If the velocity is large enough, move
-						} else {
-								//Otherwise, just stand still (this ensures gravity is applied)
-								dir = Vector3.zero;
-						}
+					dir.y = 0;
+					if (dir.sqrMagnitude > sleepVelocity * sleepVelocity) {
+							//If the velocity is large enough, move
+					} else {
+							//Otherwise, just stand still (this ensures gravity is applied)
+							dir = Vector3.zero;
+					}
 
-						if (navController != null) {
-						} else if (controller != null)
-								controller.SimpleMove (dir);
-						else
-								Debug.LogWarning ("No NavmeshController or CharacterController attached to GameObject");
+					if (navController != null) {
+					} else if (controller != null)
+							controller.SimpleMove (dir);
+					else
+							Debug.LogWarning ("No NavmeshController or CharacterController attached to GameObject");
 
-						velocity = controller.velocity;
+					velocity = controller.velocity;
 				} else {
-						velocity = Vector3.zero;
+					velocity = Vector3.zero;
 				}
 
 
@@ -151,19 +160,21 @@ namespace Pathfinding {
 				relVelocity.y = 0;
 
 				if (velocity.sqrMagnitude <= sleepVelocity * sleepVelocity) {
-						//Fade out walking animation
-						anim.Blend ("forward", 0, 0.2F);
-				} else {
+					//Fade out walking animation
+					anim.Blend ("forward", 0, 0.2F);
+				} 
+				else {
 						//Fade in walking animation
-						anim.Blend ("forward", 1, 0.2F);
+					anim.Blend ("forward", 1, 0.2F);
 
-						//Modify animation speed to match velocity
-						AnimationState states = anim ["forward"];
+					//Modify animation speed to match velocity
+					AnimationState states = anim ["forward"];
 
-						float speed = relVelocity.z;
-						states.speed = speed * animationSpeed;
+					float speed = relVelocity.z;
+					states.speed = speed * animationSpeed;
 				}
-			} else if (state == (int)State.fight) {
+			}
+			else if (state == (int)State.fight) {
 				if (target == null) state = (int)State.wait;
 			}
 		}

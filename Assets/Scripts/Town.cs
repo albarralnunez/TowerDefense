@@ -31,6 +31,7 @@ public class Town : MonoBehaviour {
 
 	void Awake () {
 		selectionHighlight = (GameObject) Instantiate(selection, selection.transform.position, transform.rotation);
+		selectionHighlight.transform.parent = gameObject.transform;
 		selectionHighlight.transform.localScale = new Vector3(radius, 1, radius);
 		selectionHighlight.SetActive(false);	
 	}
