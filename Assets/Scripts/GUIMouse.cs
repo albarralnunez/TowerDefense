@@ -50,7 +50,7 @@ public class GUIMouse : MonoBehaviour {
 			RaycastHit hit;
 			if (Physics.Raycast (ray, out hit)) {
 				if (last.GetComponent("SoldierAI") != null) {
-					Vector3 aux = hit.point + new Vector3(-39,-1,29);
+					Vector3 aux = hit.point - last.transform.parent.position;
 					last.transform.parent.Find ("defPos"). localPosition = aux;
 					//last.transform.parent.Find ("defPos").Translate(hit.point);
 				}
