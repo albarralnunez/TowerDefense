@@ -30,6 +30,7 @@ namespace Pathfinding {
 
 		public GameObject selectionHighlight;
 		public GameObject defenseHighlight;
+		public int alertHiglight;
 
 		
 		public void setHighlight(bool active) {
@@ -42,7 +43,7 @@ namespace Pathfinding {
 				(GameObject)Instantiate (Resources.Load ("Highlight"), gameObject.transform.position, Quaternion.identity);
 			selectionHighlight.transform.parent = transform;
 			//selectionHighlight.renderer.sharedMaterial.color = Color.blue;
-			selectionHighlight.transform.localScale = new Vector3(15, 1, 15);
+			selectionHighlight.transform.localScale = new Vector3(alertHiglight, 1, alertHiglight);
 			selectionHighlight.SetActive(false);
 
 			defenseHighlight = 
@@ -187,6 +188,7 @@ namespace Pathfinding {
 			}
 			else if (state == (int)State.fight) {
 				if (target == null) state = (int)State.wait;
+				//targetObj.SendMessage("",a);
 			}
 		}
 	}

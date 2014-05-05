@@ -32,6 +32,8 @@ namespace Pathfinding {
 		/** Minimum velocity for moving */
 		public float sleepVelocity = 0.4F;
 		
+		 public int life;
+	
 		/** Speed relative to velocity with which to play animations */
 		public float animationSpeed = 0.2F;
 		
@@ -112,7 +114,7 @@ namespace Pathfinding {
 			}
 			return nearestObj;
 		}
-		int asdf = 0;
+  		int asdf;
 		protected new void Update () {
 			if (statep == (int)States.walk) {
 				target = GameObject.Find("Target").transform;
