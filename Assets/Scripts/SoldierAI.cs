@@ -51,6 +51,7 @@ namespace Pathfinding {
 			//defenseHighlight.renderer.sharedMaterial.color = Color.green;
 			defenseHighlight.transform.localScale = new Vector3(3, 1, 3);
 			defenseHighlight.SetActive(false);
+
 			//Prioritize the walking animation
 			anim["forward"].layer = 10;
 			
