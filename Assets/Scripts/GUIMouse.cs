@@ -79,8 +79,7 @@ public class GUIMouse : MonoBehaviour {
 				GUI.Box (guiRect, "TOWN   lvl." + lvl.ToString ());
 				GUI.Label (new Rect (5, 20, 90, 30), t.getPeople () + " people");
 				GUI.Label (new Rect (5, 40, 90, 30), " gold/s");
-				if (GUI.Button (new Rect (5, 60, 90, 30), "Lvl+ Walls"))
-				t.wallLevelUp ();
+				if (GUI.Button (new Rect (5, 60, 90, 30), "Lvl+ Walls")) t.wallLevelUp ();
 			break;
 			case (int)State.Soldier:
 
