@@ -7,68 +7,89 @@ public class Town : MonoBehaviour {
 	public GameObject[] buildings;
 	public GameObject[] walls;
 	public GameObject selection;
+	public GameObject floor;
 	public float spaceBetweenBuildings = 15;
 	public float secondsToBuild = 10;
 	public int people = 5;
 	public int radius = 150;
-	
+	public int goldPerSec = 5;
+	public int incGold = 5;
 	Queue<GameObject> sideBuildings;
 	Queue<GameObject> wallsBuilt;
 	int level =1;
 	int wallLevel =0;
 	float timecont =0;
 	GameObject selectionHighlight;
+	bool startBuild = false;
+	Castle castle;
 
 	// Use this for initialization
 	void Start () {
+		GameObject go = GameObject.FindGameObjectWithTag("Castle");
+		castle = (Castle) go.GetComponent("Castle");
 		sideBuildings= new Queue<GameObject>();
 		wallsBuilt= new Queue<GameObject>();
-		int indx = (int)Random.Range(0,buildings.Length);
-		GameObject building = (GameObject) Instantiate(buildings[indx], transform.position, buildings[indx].transform.rotation);
-		building.transform.parent = transform;
-		sideBuildings.Enqueue(building);
 	}
 
 	void Awake () {
+		floor = (GameObject) Instantiate (floor, transform.position, transform.rotation);
+		floor.transform.parent = transform;
 		selectionHighlight = (GameObject) Instantiate(selection, selection.transform.position, transform.rotation);
 		selectionHighlight.transform.parent = gameObject.transform;
 		selectionHighlight.transform.localScale = new Vector3(radius, 1, radius);
 		selectionHighlight.SetActive(false);	
 	}
 
+	public void startBuilding() {
+		Destroy(floor);
+		int indx = (int)Random.Range(0,buildings.Length);
+		GameObject building = (GameObject) Instantiate(buildings[indx], transform.position, buildings[indx].transform.rotation);
+		building.transform.parent = transform;
+		sideBuildings.Enqueue(building);
+		startBuild = true;
+		InvokeRepeating("addGold", secondsToBuild,1);
+	}
+
+	void addGold() {
+		castle.addGold(goldPerSec);
+	}
+
 	void Update () {
-		timecont += Time.deltaTime;
-		if(timecont>= secondsToBuild) {
-			timecont = 0;
-			Vector3 pos = new Vector3(0,0,0);
-			bool found = false;
-			while(!found) {
-				GameObject sideBuilding = sideBuildings.Peek();
-				for(int i=0; i< 4 && !found; ++i) {
-					pos = sideBuilding.transform.position;
-					switch(i) {
-						case 0: pos.x -= spaceBetweenBuildings; break;
-						case 1: pos.z -= spaceBetweenBuildings; break;
-						case 2: pos.x += spaceBetweenBuildings; break;
-						case 3: pos.z += spaceBetweenBuildings; break;
+		if(startBuild) {
+			timecont += Time.deltaTime;
+			if(timecont>= secondsToBuild) {
+				timecont = 0;
+				Vector3 pos = new Vector3(0,0,0);
+				bool found = false;
+				while(!found) {
+					GameObject sideBuilding = sideBuildings.Peek();
+					for(int i=0; i< 4 && !found; ++i) {
+						pos = sideBuilding.transform.position;
+						switch(i) {
+							case 0: pos.x -= spaceBetweenBuildings; break;
+							case 1: pos.z -= spaceBetweenBuildings; break;
+							case 2: pos.x += spaceBetweenBuildings; break;
+							case 3: pos.z += spaceBetweenBuildings; break;
+						}
+						found = true;
+						for(int j = 0; j< transform.childCount && found; ++j) {
+							Vector3 posch = transform.GetChild(j).position;
+							if(pos.x == posch.x && pos.z == posch.z) found = false;
+						}
 					}
-					found = true;
-					for(int j = 0; j< transform.childCount && found; ++j) {
-						Vector3 posch = transform.GetChild(j).position;
-						if(pos.x == posch.x && pos.z == posch.z) found = false;
+					if(!found) sideBuildings.Dequeue();
+					else {
+						int b = Random.Range(0,buildings.Length);
+						GameObject building = (GameObject) Instantiate(buildings[b], new Vector3(pos.x, 0, pos.z), buildings[b].transform.rotation);
+						building.transform.parent = transform;
+						sideBuildings.Enqueue(building);
+						goldPerSec = incGold*(transform.childCount-2);
 					}
 				}
-				if(!found) sideBuildings.Dequeue();
-				else {
-					int b = Random.Range(0,buildings.Length);
-					GameObject building = (GameObject) Instantiate(buildings[b], new Vector3(pos.x, 0, pos.z), buildings[b].transform.rotation);
-					building.transform.parent = transform;
-					sideBuildings.Enqueue(building);
+				if(wallLevel>0) {
+					destroyWalls();
+					buildWalls();
 				}
-			}
-			if(wallLevel>0) {
-				destroyWalls();
-				buildWalls();
 			}
 		}
 	}
