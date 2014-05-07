@@ -45,14 +45,14 @@ namespace Pathfinding {
 
 		public new void Start () {
 			selectionHighlight = 
-				(GameObject)Instantiate (Resources.Load ("Highlight"), gameObject.transform.position, Quaternion.identity);
+				(GameObject)Instantiate (Resources.Load ("Highlight"), gameObject.transform.position - new Vector3(0.0F,0.8F,0.0F), Quaternion.identity);
 			selectionHighlight.transform.parent = transform;
 			//selectionHighlight.renderer.sharedMaterial.color = Color.blue;
 			selectionHighlight.transform.localScale = new Vector3(alertHiglight, 1, alertHiglight);
 			selectionHighlight.SetActive(false);
 
 			defenseHighlight = 
-				(GameObject)Instantiate (Resources.Load ("HighlightDef"), transform.parent.Find ("defPos").transform.position,Quaternion.identity);
+				(GameObject)Instantiate (Resources.Load ("HighlightDef"), transform.parent.Find ("defPos").transform.position - new Vector3(0.0F,0.8F,0.0F),Quaternion.identity);
 			defenseHighlight.transform.parent = transform.parent.Find ("defPos");
 			//defenseHighlight.renderer.sharedMaterial.color = Color.green;
 			defenseHighlight.transform.localScale = new Vector3(3, 1, 3);
@@ -203,7 +203,11 @@ namespace Pathfinding {
 					attackTime = 0;
 				}
 			}
-			if (life <= 0) Destroy(transform.parent.gameObject);
+			if (life <= 0) {
+				Toolbox toolbox = Toolbox.Instance;
+				toolbox.EnemyBusy.Remove (targetObj.GetInstanceID ());
+				Destroy(transform.parent.gameObject);
+			}
 		}
 	}
 }

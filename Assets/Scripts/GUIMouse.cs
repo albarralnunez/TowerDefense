@@ -49,10 +49,12 @@ public class GUIMouse : MonoBehaviour {
 			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 			RaycastHit hit;
 			if (Physics.Raycast (ray, out hit)) {
-				if (last.GetComponent("SoldierAI") != null) {
-					Vector3 aux = hit.point - last.transform.parent.position;
-					last.transform.parent.Find ("defPos"). localPosition = aux;
-					//last.transform.parent.Find ("defPos").Translate(hit.point);
+				if (last != null) {
+					if (last.GetComponent("SoldierAI") != null) {
+						Vector3 aux = hit.point - last.transform.parent.position;
+						last.transform.parent.Find ("defPos"). localPosition = aux;
+						//last.transform.parent.Find ("defPos").Translate(hit.point);
+					}
 				}
 			}
 		}
@@ -60,13 +62,15 @@ public class GUIMouse : MonoBehaviour {
 
 	private void UnMark() {
 		//Unmark
-		if (last.GetComponent("SoldierAI") != null) {
-			Pathfinding.SoldierAI s = (Pathfinding.SoldierAI)last.GetComponent("SoldierAI");
-			s.setHighlight(false);
-		}
-		if (last.GetComponent("Town") != null) {
-			Town t = (Town)last.GetComponent("Town");
-			t.setHighlight(false);
+		if (last != null) {
+			if (last.GetComponent("SoldierAI") != null) {
+				Pathfinding.SoldierAI s = (Pathfinding.SoldierAI)last.GetComponent("SoldierAI");
+				s.setHighlight(false);
+			}
+			if (last.GetComponent("Town") != null) {
+				Town t = (Town)last.GetComponent("Town");
+				t.setHighlight(false);
+			}
 		}
 	}
 

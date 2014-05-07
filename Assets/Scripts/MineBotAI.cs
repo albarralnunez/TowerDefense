@@ -185,7 +185,11 @@ namespace Pathfinding {
 					attackTime = 0;
 				}
 			}
-			if (life <= 0) Destroy(gameObject);
+			if (life <= 0) {
+				Toolbox toolbox = Toolbox.Instance;
+				toolbox.EnemyBusy.Remove (gameObject.GetInstanceID ());
+				Destroy(gameObject);
+			}
 		}
 	}
 }

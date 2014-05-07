@@ -26,6 +26,7 @@ public class Town : MonoBehaviour {
 		int indx = (int)Random.Range(0,buildings.Length);
 		GameObject building = (GameObject) Instantiate(buildings[indx], transform.position, buildings[indx].transform.rotation);
 		building.transform.parent = transform;
+		AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO!
 		sideBuildings.Enqueue(building);
 	}
 
@@ -63,6 +64,7 @@ public class Town : MonoBehaviour {
 					int b = Random.Range(0,buildings.Length);
 					GameObject building = (GameObject) Instantiate(buildings[b], new Vector3(pos.x, 0, pos.z), buildings[b].transform.rotation);
 					building.transform.parent = transform;
+					AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO:!!!
 					sideBuildings.Enqueue(building);
 				}
 			}
@@ -156,6 +158,7 @@ public class Town : MonoBehaviour {
 					case 2: wallsBuilt.Enqueue((GameObject)Instantiate(walls[wallLevel-1], new Vector3(pos.x+walls[wallLevel-1].transform.position.x-spaceBetweenBuildings/2, 0, pos.z+walls[wallLevel-1].transform.position.z), Quaternion.Euler(new Vector3(0,90,0)))); break;
 					case 3: wallsBuilt.Enqueue((GameObject)Instantiate(walls[wallLevel-1], new Vector3(pos.x+walls[wallLevel-1].transform.position.x, 0, pos.z+walls[wallLevel-1].transform.position.z-+spaceBetweenBuildings/2), Quaternion.Euler(new Vector3(0,0,0)))); break;
 					}
+					//AstarPath.active.UpdateGraphs(wallsBuilt.Peek().collider.bounds); //TODO!!
 				}
 			}
 		}
