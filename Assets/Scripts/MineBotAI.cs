@@ -31,7 +31,7 @@ namespace Pathfinding {
 		public float distanceAlert = 20.0F;
 		/** Minimum velocity for moving */
 		public float sleepVelocity = 0.4F;
-		
+			
 		/** Speed relative to velocity with which to play animations */
 		public float animationSpeed = 0.2F;
 		
@@ -40,12 +40,24 @@ namespace Pathfinding {
 		public GameObject endOfPathEffect;
 		public int statep;
 
-		public void SetToFight() {
+		public int life;
+		public int damage;
+		public int attackSpeed;
+		private float attackTime;
+		private GameObject attacker;
+
+		public void SetToFight(GameObject a) {
 			statep = (int)States.fight;
+			attacker = a;
+		}
+
+		public void ApplyDamage(int damage) {
+			life -= damage;
 		}
 
 		public new void Start () {
-
+			
+			attackTime = 0;
 			statep = (int)States.walk;
 
 			//Prioritize the walking animation
@@ -112,7 +124,7 @@ namespace Pathfinding {
 			}
 			return nearestObj;
 		}
-		int asdf = 0;
+  		int asdf;
 		protected new void Update () {
 			if (statep == (int)States.walk) {
 				target = GameObject.Find("Target").transform;
@@ -141,38 +153,43 @@ namespace Pathfinding {
 							Debug.LogWarning ("No NavmeshController or CharacterController attached to GameObject");
 
 					velocity = controller.velocity;
-					} else {
-							velocity = Vector3.zero;
-					}
-					//Animation
-
-					//Calculate the velocity relative to this transform's orientation
-					Vector3 relVelocity = tr.InverseTransformDirection (velocity);
-					relVelocity.y = 0;
-
-					if (velocity.sqrMagnitude <= sleepVelocity * sleepVelocity) {
-							//Fade out walking animation
-							anim.Blend ("forward", 0, 0.2F);
-					} else {
-							//Fade in walking animation
-							anim.Blend ("forward", 1, 0.2F);
-
-							//Modify animation speed to match velocity
-							AnimationState state = anim ["forward"];
-
-							float speed = relVelocity.z;
-							state.speed = speed * animationSpeed;
-					}
-
-				} else if (statep == (int)States.fight) {
-					++asdf;
-					if (asdf == 600) {
-						Toolbox toolbox = Toolbox.Instance;
-						toolbox.EnemyBusy.Remove (gameObject.GetInstanceID ());
-						Destroy(gameObject);
-						
-					}
+				} 
+				else {
+					velocity = Vector3.zero;
 				}
+				//Animation
+	
+				//Calculate the velocity relative to this transform's orientation
+				Vector3 relVelocity = tr.InverseTransformDirection (velocity);
+				relVelocity.y = 0;
+	
+				if (velocity.sqrMagnitude <= sleepVelocity * sleepVelocity) {
+					//Fade out walking animation
+					anim.Blend ("forward", 0, 0.2F);
+				} else {
+					//Fade in walking animation
+					anim.Blend ("forward", 1, 0.2F);
+	
+					//Modify animation speed to match velocity
+					AnimationState state = anim ["forward"];
+	
+					float speed = relVelocity.z;
+					state.speed = speed * animationSpeed;
+				}
+			} 
+			else if (statep == (int)States.fight) {
+				attackTime += Time.deltaTime;
+				if (attacker  == null) statep = (int)States.walk;
+				else if (attackSpeed <= attackTime) {
+					attacker.SendMessage("ApplyDamage",damage);
+					attackTime = 0;
+				}
+			}
+			if (life <= 0) {
+				Toolbox toolbox = Toolbox.Instance;
+				toolbox.EnemyBusy.Remove (gameObject.GetInstanceID ());
+				Destroy(gameObject);
+			}
 		}
 	}
 }

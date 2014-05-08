@@ -13,7 +13,9 @@ public class CameraControl : MonoBehaviour {
 	public float currentZoom = 200;
 	public float minZoom =20;
 	public float maxZoom = 1300;
-
+	
+	public Vector4 limits;
+	
 	Vector3 pos = new Vector3(0,0,0);
 	Vector3 rot = new Vector3(45, 0, 0);
 	Vector2 pre = new Vector2(-1,-1);
@@ -47,15 +49,19 @@ public class CameraControl : MonoBehaviour {
 		else {
 			if(Input.mousePosition.x <= edgeSensibility || Input.GetKey(KeyCode.A)){
 				pos.x -= cameraVelocity*(currentZoom/100);
+				if(pos.x < limits.x) pos.x = limits.x;
 			}
 			else if(Input.mousePosition.x >= Screen.width - edgeSensibility || Input.GetKey(KeyCode.D)){
 				pos.x += cameraVelocity*(currentZoom/100);
+				if(pos.x > limits.y) pos.x = limits.y;
 			}
 			if(Input.mousePosition.y <= edgeSensibility || Input.GetKey(KeyCode.S)) {
 				pos.z -= cameraVelocity*(currentZoom/100);
+				if(pos.z < limits.z) pos.z = limits.z;
 			}
 			else if(Input.mousePosition.y >= Screen.height - edgeSensibility || Input.GetKey(KeyCode.W)) {
 				pos.z += cameraVelocity*(currentZoom/100);
+				if(pos.z > limits.w) pos.z = limits.w;
 			}
 			pre.y = -1;
 			pre.x = -1;

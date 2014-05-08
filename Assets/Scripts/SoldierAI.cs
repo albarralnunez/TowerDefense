@@ -27,10 +27,16 @@ namespace Pathfinding {
 		private int state = (int)State.wait;
 		private GameObject targetObj;
 		private Transform defPosition;
+		
+		public int life;
+		public int damage;
+		public int attackSpeed;		
 
 		public GameObject selectionHighlight;
 		public GameObject defenseHighlight;
+		public int alertHiglight;
 
+		private float attackTime;
 		
 		public void setHighlight(bool active) {
 			selectionHighlight.SetActive(active);
@@ -39,14 +45,14 @@ namespace Pathfinding {
 
 		public new void Start () {
 			selectionHighlight = 
-				(GameObject)Instantiate (Resources.Load ("Highlight"), gameObject.transform.position, Quaternion.identity);
+				(GameObject)Instantiate (Resources.Load ("Highlight"), gameObject.transform.position - new Vector3(0.0F,0.8F,0.0F), Quaternion.identity);
 			selectionHighlight.transform.parent = transform;
 			//selectionHighlight.renderer.sharedMaterial.color = Color.blue;
-			selectionHighlight.transform.localScale = new Vector3(15, 1, 15);
+			selectionHighlight.transform.localScale = new Vector3(alertHiglight, 1, alertHiglight);
 			selectionHighlight.SetActive(false);
 
 			defenseHighlight = 
-				(GameObject)Instantiate (Resources.Load ("HighlightDef"), transform.parent.Find ("defPos").transform.position,Quaternion.identity);
+				(GameObject)Instantiate (Resources.Load ("HighlightDef"), transform.parent.Find ("defPos").transform.position - new Vector3(0.0F,0.8F,0.0F),Quaternion.identity);
 			defenseHighlight.transform.parent = transform.parent.Find ("defPos");
 			//defenseHighlight.renderer.sharedMaterial.color = Color.green;
 			defenseHighlight.transform.localScale = new Vector3(3, 1, 3);
@@ -112,6 +118,10 @@ namespace Pathfinding {
 			return nearestObj;
 		}
 
+		public void ApplyDamage(int damage) {
+			life -= damage;
+		}
+
 		protected new void Update () {
 			if (state == (int)State.wait) {
 				if (!hunting) {
@@ -126,7 +136,7 @@ namespace Pathfinding {
 						float distanceSqr = (target.position - transform.position).sqrMagnitude;
 						if (distanceSqr < 5) {
 							state = (int)State.fight;
-							targetObj.GetComponent<Pathfinding.MineBotAI> ().SetToFight ();
+							targetObj.GetComponent<Pathfinding.MineBotAI> ().SetToFight (gameObject);
 						}
 					} else {
 						hunting = false;
@@ -186,7 +196,17 @@ namespace Pathfinding {
 				}
 			}
 			else if (state == (int)State.fight) {
+				attackTime += Time.deltaTime;
 				if (target == null) state = (int)State.wait;
+				else if (attackSpeed <= attackTime) {
+					targetObj.SendMessage("ApplyDamage",damage);
+					attackTime = 0;
+				}
+			}
+			if (life <= 0) {
+				Toolbox toolbox = Toolbox.Instance;
+				toolbox.EnemyBusy.Remove (targetObj.GetInstanceID ());
+				Destroy(transform.parent.gameObject);
 			}
 		}
 	}
