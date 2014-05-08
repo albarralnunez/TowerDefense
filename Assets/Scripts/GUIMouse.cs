@@ -79,21 +79,7 @@ public class GUIMouse : MonoBehaviour {
 	}
 
 	private void UnMark() {
-<<<<<<< HEAD
 		if(last!= null) last.SendMessage("setHighlight",false);
-=======
-		//Unmark
-		if (last != null) {
-			if (last.GetComponent("SoldierAI") != null) {
-				Pathfinding.SoldierAI s = (Pathfinding.SoldierAI)last.GetComponent("SoldierAI");
-				s.setHighlight(false);
-			}
-			if (last.GetComponent("Town") != null) {
-				Town t = (Town)last.GetComponent("Town");
-				t.setHighlight(false);
-			}
-		}
->>>>>>> 6d787670875dada6065b9ce2e6d296db0aa69fe1
 	}
 
 	void OnGUI () {

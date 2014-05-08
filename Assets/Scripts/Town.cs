@@ -29,14 +29,6 @@ public class Town : MonoBehaviour {
 		castle = (Castle) go.GetComponent("Castle");
 		sideBuildings= new Queue<GameObject>();
 		wallsBuilt= new Queue<GameObject>();
-<<<<<<< HEAD
-=======
-		int indx = (int)Random.Range(0,buildings.Length);
-		GameObject building = (GameObject) Instantiate(buildings[indx], transform.position, buildings[indx].transform.rotation);
-		building.transform.parent = transform;
-		AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO!
-		sideBuildings.Enqueue(building);
->>>>>>> 6d787670875dada6065b9ce2e6d296db0aa69fe1
 	}
 
 	void Awake () {
@@ -53,6 +45,7 @@ public class Town : MonoBehaviour {
 		int indx = (int)Random.Range(0,buildings.Length);
 		GameObject building = (GameObject) Instantiate(buildings[indx], transform.position, buildings[indx].transform.rotation);
 		building.transform.parent = transform;
+		//AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO!
 		sideBuildings.Enqueue(building);
 		startBuild = true;
 		InvokeRepeating("addGold", secondsToBuild,1);
@@ -90,23 +83,14 @@ public class Town : MonoBehaviour {
 						int b = Random.Range(0,buildings.Length);
 						GameObject building = (GameObject) Instantiate(buildings[b], new Vector3(pos.x, 0, pos.z), buildings[b].transform.rotation);
 						building.transform.parent = transform;
+						//AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO:!!!
 						sideBuildings.Enqueue(building);
 						goldPerSec = incGold*(transform.childCount-2);
 					}
 				}
-<<<<<<< HEAD
 				if(wallLevel>0) {
 					destroyWalls();
 					buildWalls();
-=======
-				if(!found) sideBuildings.Dequeue();
-				else {
-					int b = Random.Range(0,buildings.Length);
-					GameObject building = (GameObject) Instantiate(buildings[b], new Vector3(pos.x, 0, pos.z), buildings[b].transform.rotation);
-					building.transform.parent = transform;
-					AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO:!!!
-					sideBuildings.Enqueue(building);
->>>>>>> 6d787670875dada6065b9ce2e6d296db0aa69fe1
 				}
 			}
 		}
