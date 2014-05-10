@@ -45,7 +45,7 @@ public class Town : MonoBehaviour {
 		int indx = (int)Random.Range(0,buildings.Length);
 		GameObject building = (GameObject) Instantiate(buildings[indx], transform.position, buildings[indx].transform.rotation);
 		building.transform.parent = transform;
-		//AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO!
+		AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO!
 		sideBuildings.Enqueue(building);
 		startBuild = true;
 		InvokeRepeating("addGold", secondsToBuild,1);
@@ -83,7 +83,7 @@ public class Town : MonoBehaviour {
 						int b = Random.Range(0,buildings.Length);
 						GameObject building = (GameObject) Instantiate(buildings[b], new Vector3(pos.x, 0, pos.z), buildings[b].transform.rotation);
 						building.transform.parent = transform;
-						//AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO:!!!
+						AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO:!!!
 						sideBuildings.Enqueue(building);
 						goldPerSec = incGold*(transform.childCount-2);
 					}
@@ -173,13 +173,24 @@ public class Town : MonoBehaviour {
 					if(pos.x == posch.x && pos.z == posch.z) found = false;
 				}
 				if(found) {
+					GameObject aux = selectionHighlight;
 					switch(i) {
-					case 0: wallsBuilt.Enqueue((GameObject)Instantiate(walls[wallLevel-1], new Vector3(pos.x+walls[wallLevel-1].transform.position.x+spaceBetweenBuildings/2, 0, pos.z+walls[wallLevel-1].transform.position.z), Quaternion.Euler(new Vector3(0,90,0)))); break;
-					case 1: wallsBuilt.Enqueue((GameObject)Instantiate(walls[wallLevel-1], new Vector3(pos.x+walls[wallLevel-1].transform.position.x, 0, pos.z+walls[wallLevel-1].transform.position.z+spaceBetweenBuildings/2), Quaternion.Euler(new Vector3(0,0,0)))); break;
-					case 2: wallsBuilt.Enqueue((GameObject)Instantiate(walls[wallLevel-1], new Vector3(pos.x+walls[wallLevel-1].transform.position.x-spaceBetweenBuildings/2, 0, pos.z+walls[wallLevel-1].transform.position.z), Quaternion.Euler(new Vector3(0,90,0)))); break;
-					case 3: wallsBuilt.Enqueue((GameObject)Instantiate(walls[wallLevel-1], new Vector3(pos.x+walls[wallLevel-1].transform.position.x, 0, pos.z+walls[wallLevel-1].transform.position.z-+spaceBetweenBuildings/2), Quaternion.Euler(new Vector3(0,0,0)))); break;
+					case 0: 
+						aux = (GameObject)Instantiate(walls[wallLevel-1], new Vector3(pos.x+walls[wallLevel-1].transform.position.x+spaceBetweenBuildings/2, 0, pos.z+walls[wallLevel-1].transform.position.z), Quaternion.Euler(new Vector3(0,90,0))); 		
+					break;
+					case 1:
+						aux = (GameObject)Instantiate(walls[wallLevel-1], new Vector3(pos.x+walls[wallLevel-1].transform.position.x, 0, pos.z+walls[wallLevel-1].transform.position.z+spaceBetweenBuildings/2), Quaternion.Euler(new Vector3(0,0,0)));
+					break;
+					case 2: 
+						aux = (GameObject)Instantiate(walls[wallLevel-1], new Vector3(pos.x+walls[wallLevel-1].transform.position.x-spaceBetweenBuildings/2, 0, pos.z+walls[wallLevel-1].transform.position.z), Quaternion.Euler(new Vector3(0,90,0)));
+					break;
+					case 3: 
+						aux = (GameObject)Instantiate(walls[wallLevel-1], new Vector3(pos.x+walls[wallLevel-1].transform.position.x, 0, pos.z+walls[wallLevel-1].transform.position.z-+spaceBetweenBuildings/2), Quaternion.Euler(new Vector3(0,0,0)));
+					break;
 					}
-					//AstarPath.active.UpdateGraphs(wallsBuilt.Peek().collider.bounds); //TODO!!
+					wallsBuilt.Enqueue(aux); 
+					AstarPath.active.UpdateGraphs(aux.transform.Find("townFence_1_ends").collider.bounds); //TODO!!
+					AstarPath.active.UpdateGraphs(aux.transform.Find("townFence_2_ends").collider.bounds); //TODO!!
 				}
 			}
 		}
