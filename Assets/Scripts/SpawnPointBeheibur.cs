@@ -16,6 +16,7 @@ public class SpawnPointBeheibur : MonoBehaviour {
 
 	void Spawn() {
 		GameObject go = (GameObject)Instantiate(Resources.Load<GameObject> ("Bot"),gameObject.transform.position, Quaternion.identity);
+		go.transform.localScale = new Vector3 (10,10,10); //<-esto lo he añadido pa ke sean mas grandes!
 		go.transform.parent = gameObject.transform;
 		Pathfinding.MineBotAI comp = go.GetComponent<Pathfinding.MineBotAI>();
 		//comp.target = GameObject.Find("Target").transform;

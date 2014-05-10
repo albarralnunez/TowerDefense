@@ -33,6 +33,10 @@ public class Castle : MonoBehaviour {
 		return people;
 	}
 
+	public void addPeople(int peopl) {
+		people += peopl;
+	}
+
 	public void addGold(int gld) {
 		gold += gld;
 	}
