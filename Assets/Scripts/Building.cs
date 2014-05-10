@@ -17,6 +17,7 @@ public class Building : MonoBehaviour {
 	GameObject smokePart;
 	GameObject floorPart;
 	GameObject soldierPart =null;
+
 	// Use this for initialization
 	void Start () {
 		GameObject c = GameObject.FindGameObjectWithTag("Castle");
@@ -46,7 +47,7 @@ public class Building : MonoBehaviour {
 	}
 	void spawnSoldier() {
 		if(soldierPart == null) {
-			soldierPart= (GameObject) Instantiate(soldier, transform.position, transform.rotation);
+			soldierPart= (GameObject) Instantiate(soldier, transform.position, soldier.transform.rotation);
 			soldierPart.transform.localScale = new Vector3(10,10,10);
 			castle.addPeople(1);
 		}
