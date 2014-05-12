@@ -6,7 +6,7 @@ public class Building : MonoBehaviour {
 	public float timeBuild = 20;
 	public GameObject smoke;
 	public GameObject floor;
-	public float ysize = 40;
+	public float ysize = 80;
 	public GameObject soldier;
 	public float timeSpawn = 20;
 
