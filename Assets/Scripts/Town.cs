@@ -11,9 +11,10 @@ public class Town : MonoBehaviour {
 	public float spaceBetweenBuildings = 15;
 	public float secondsToBuild = 10;
 	public int people = 5;
-	public int radius = 150;
+	public int radius = 100;
 	public int goldPerSec = 5;
 	public int incGold = 5;
+	public int[] levelReq;
 	Queue<GameObject> sideBuildings;
 	Queue<GameObject> wallsBuilt;
 	int level =1;
@@ -86,6 +87,10 @@ public class Town : MonoBehaviour {
 						AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO:!!!
 						sideBuildings.Enqueue(building);
 						goldPerSec = incGold*(transform.childCount-2);
+						if(transform.childCount-2 > levelReq[level-1]) {
+							++level;
+							selectionHighlight.transform.localScale = new Vector3(radius+50*level, 1, radius+50*level);
+						}
 					}
 				}
 				if(wallLevel>0) {
