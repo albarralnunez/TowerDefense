@@ -20,7 +20,7 @@ public class Castle : MonoBehaviour {
 	}
 
 	void Awake () {
-		selectionHighlight = (GameObject) Instantiate(selection, new Vector3(transform.position.x-15, transform.position.y,transform.position.z), transform.rotation);
+		selectionHighlight = (GameObject) Instantiate(selection, new Vector3(transform.position.x-23, transform.position.y,transform.position.z), transform.rotation);
 		selectionHighlight.transform.localScale = new Vector3(radius, 1, radius);
 		selectionHighlight.SetActive(false);	
 	}
