@@ -98,6 +98,7 @@ public class GUIMouse : MonoBehaviour {
 			break;
 			case State.Castle:
 				GUI.Box (guiRect, "Castle");
+			GUI.Label (new Rect (5, 20, 90, 30), (castle.getLife()).ToString() + " / " + (castle.getTotalHP()).ToString());
 				if (GUI.Button (new Rect (5, 60, 90, 30), "Build Town")){
 					construction = castle.buildTown();
 					if(construction != null) {

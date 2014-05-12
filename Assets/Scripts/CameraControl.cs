@@ -10,14 +10,14 @@ public class CameraControl : MonoBehaviour {
 	public float cameraVelocity = 7;
 	public float zoomVelocity = 50;
 	public float rotVelocity = 5;
-	public float currentZoom = 200;
+	public float currentZoom = 550;
 	public float minZoom =20;
 	public float maxZoom = 1300;
 	
 	public Vector4 limits;
 	
 	Vector3 pos = new Vector3(0,0,0);
-	Vector3 rot = new Vector3(20, 0, 0);
+	Vector3 rot = new Vector3(70, 0, 0);
 	Vector2 pre = new Vector2(-1,-1);
 	
 	// Use this for initialization

@@ -7,13 +7,16 @@ public class Castle : MonoBehaviour {
 	public GameObject selection;
 	public int radius = 150;
 	public int townCost = 900;
+	public int hp = 20000;
+
+
 	int gold = 1000;
 	int people = 0;
-
+	int life;
 	GameObject selectionHighlight;
 
 	void Start() {
-
+		life = hp;
 	}
 
 	void Awake () {
@@ -39,6 +42,18 @@ public class Castle : MonoBehaviour {
 
 	public void addGold(int gld) {
 		gold += gld;
+	}
+
+	public int getTotalHP() {
+		return hp;
+	}
+
+	public int getLife() {
+		return life;
+	}
+
+	public void hit(int attack) {
+		life -= attack;
 	}
 
 	public GameObject buildTown() {
