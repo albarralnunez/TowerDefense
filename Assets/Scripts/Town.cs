@@ -194,8 +194,8 @@ public class Town : MonoBehaviour {
 					break;
 					}
 					wallsBuilt.Enqueue(aux); 
-					AstarPath.active.UpdateGraphs(aux.transform.Find("townFence_1_ends").collider.bounds); //TODO!!
-					AstarPath.active.UpdateGraphs(aux.transform.Find("townFence_2_ends").collider.bounds); //TODO!!
+					//AstarPath.active.UpdateGraphs(aux.transform.Find("1").collider.bounds); //TODO!!
+					//AstarPath.active.UpdateGraphs(aux.transform.Find("2").collider.bounds); //TODO!!
 				}
 			}
 		}
