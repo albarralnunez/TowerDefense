@@ -49,7 +49,7 @@ public class GUIMouse : MonoBehaviour {
 						last = (GameObject)hit.transform.parent.transform.parent.gameObject;
 						last.SendMessage("setHighlight", true);
 						state = State.Town;
-					} else if (hit.collider.name == "SoldierObj") {
+					} else if (hit.collider.tag == "Soldier") {
 						last = (GameObject)hit.transform.gameObject;
 						last.SendMessage("setHighlight", true);
 						state = State.Soldier;
@@ -69,8 +69,8 @@ public class GUIMouse : MonoBehaviour {
 			if (Physics.Raycast (ray, out hit)) {
 				if (last != null) {
 					if (last.GetComponent("SoldierAI") != null) {
-						Vector3 aux = hit.point - last.transform.parent.position;
-						last.transform.parent.Find ("defPos"). localPosition = aux;
+						//Vector3 aux = hit.point - last.transform.parent.position;
+						last.transform.parent.Find ("defPos").position = hit.point;
 						//last.transform.parent.Find ("defPos").Translate(hit.point);
 					}
 				}
@@ -94,7 +94,11 @@ public class GUIMouse : MonoBehaviour {
 				GUI.Label (new Rect (5, 40, 90, 30), " gold/s");
 				if (GUI.Button (new Rect (5, 60, 90, 30), "Lvl+ Walls")) t.wallLevelUp ();
 			break;
-			case State.Soldier:
+			case State.Soldier: 
+				GUI.Box (guiRect, "Soldier");
+				Pathfinding.SoldierAI sai = (Pathfinding.SoldierAI) last.GetComponent ("SoldierAI");
+			GUI.Label (new Rect (5, 20, 90, 30), (sai.getLife()).ToString() + " / " + (sai.getTotalHP()).ToString());
+
 			break;
 			case State.Castle:
 				GUI.Box (guiRect, "Castle");

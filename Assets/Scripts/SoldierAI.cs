@@ -24,26 +24,32 @@ namespace Pathfinding {
 		public GameObject endOfPathEffect;
 
 		private bool hunting = false;
-		private int state = (int)State.wait;
+		private State state = State.wait;
 		private GameObject targetObj;
 		private Transform defPosition;
 		
 		public int life;
 		public int damage;
 		public int attackSpeed;		
+		private int curLife;
 
 		public GameObject selectionHighlight;
 		public GameObject defenseHighlight;
 		public int alertHiglight;
 
 		private float attackTime;
-		
+
+		public int getTotalHP() {return life;}
+
+		public int getLife() { return curLife;}
+
 		public void setHighlight(bool active) {
 			selectionHighlight.SetActive(active);
 			defenseHighlight.SetActive(active);
 		}
-
+		
 		public new void Start () {
+			curLife = life;
 			selectionHighlight = 
 				(GameObject)Instantiate (Resources.Load ("Highlight"), gameObject.transform.position - new Vector3(0.0F,0.8F,0.0F), Quaternion.identity);
 			selectionHighlight.transform.parent = transform;
@@ -118,12 +124,12 @@ namespace Pathfinding {
 			return nearestObj;
 		}
 
-		public void ApplyDamage(int damage) {
-			life -= damage;
+		public void hit(int damage) {
+			curLife -= damage;
 		}
 
 		protected new void Update () {
-			if (state == (int)State.wait) {
+			if (state == State.wait) {
 				if (!hunting) {
 					targetObj = GetNearestTaggedObject ();
 					if (defPosition != gameObject.transform && targetObj == null)
@@ -135,7 +141,7 @@ namespace Pathfinding {
 						target = targetObj.transform;
 						float distanceSqr = (target.position - transform.position).sqrMagnitude;
 						if (distanceSqr < 5) {
-							state = (int)State.fight;
+							state = State.fight;
 							targetObj.GetComponent<Pathfinding.MineBotAI> ().SetToFight (gameObject);
 						}
 					} else {
@@ -195,11 +201,11 @@ namespace Pathfinding {
 					states.speed = speed * animationSpeed;
 				}
 			}
-			else if (state == (int)State.fight) {
+			else if (state == State.fight) {
 				attackTime += Time.deltaTime;
-				if (target == null) state = (int)State.wait;
+				if (target == null) state = State.wait;
 				else if (attackSpeed <= attackTime) {
-					targetObj.SendMessage("ApplyDamage",damage);
+					targetObj.SendMessage("hit",damage);
 					attackTime = 0;
 				}
 			}
@@ -209,5 +215,6 @@ namespace Pathfinding {
 				Destroy(transform.parent.gameObject);
 			}
 		}
+		
 	}
 }

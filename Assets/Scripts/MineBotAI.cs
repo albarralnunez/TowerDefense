@@ -22,7 +22,7 @@ namespace Pathfinding {
 	[RequireComponent(typeof(Seeker))]
 	public class MineBotAI : AIPath {
 
-		enum States {fight,walk};
+		enum State {fight,walk};
 
 		/** Animation component.
 		 * Should hold animations "awake" and "forward"
@@ -38,27 +38,35 @@ namespace Pathfinding {
 		/** Effect which will be instantiated when end of path is reached.
 		 * \see OnTargetReached */
 		public GameObject endOfPathEffect;
-		public int statep;
+
 
 		public int life;
 		public int damage;
 		public int attackSpeed;
+		private State state;
+
+		private int curLife;
 		private float attackTime;
 		private GameObject attacker;
 
 		public void SetToFight(GameObject a) {
-			statep = (int)States.fight;
+			state = State.fight;
 			attacker = a;
 		}
 
-		public void ApplyDamage(int damage) {
-			life -= damage;
+		public void hit(int damage) {
+			curLife -= damage;
 		}
 
+		public int getTotalHP() {return life;}
+		
+		public int getLife() { return curLife;}
+
 		public new void Start () {
-			
+
+			curLife = life;
 			attackTime = 0;
-			statep = (int)States.walk;
+			state = State.walk;
 
 			//Prioritize the walking animation
 			anim["forward"].layer = 10;
@@ -124,9 +132,9 @@ namespace Pathfinding {
 			}
 			return nearestObj;
 		}
-  		int asdf;
+
 		protected new void Update () {
-			if (statep == (int)States.walk) {
+			if (state == State.walk) {
 				target = GameObject.Find("Target").transform;
 				//Get velocity in world-space
 				Vector3 velocity;
@@ -171,18 +179,22 @@ namespace Pathfinding {
 					anim.Blend ("forward", 1, 0.2F);
 	
 					//Modify animation speed to match velocity
-					AnimationState state = anim ["forward"];
+					AnimationState statea = anim ["forward"];
 	
 					float speed = relVelocity.z;
-					state.speed = speed * animationSpeed;
+					statea.speed = speed * animationSpeed;
 				}
 			} 
-			else if (statep == (int)States.fight) {
+			else if (state == State.fight) {
 				attackTime += Time.deltaTime;
-				if (attacker  == null) statep = (int)States.walk;
+				if (attacker  == null) state = State.walk;
 				else if (attackSpeed <= attackTime) {
-					attacker.SendMessage("ApplyDamage",damage);
+					attacker.SendMessage("hit",damage);
 					attackTime = 0;
+					if(attacker.activeSelf == false) {
+						attacker = null;
+						state = State.walk;
+					}
 				}
 			}
 			if (life <= 0) {
@@ -191,5 +203,13 @@ namespace Pathfinding {
 				Destroy(gameObject);
 			}
 		}
+
+		//a la ke choque con un soldier, un building o un castle lo atacara
+		void OnTriggerEnter(Collider col) {
+			if(col.tag == "Soldier"||col.tag=="Building" || col.tag == "Castle") {
+				SetToFight (col.gameObject);
+			}
+		}
+
 	}
 }

@@ -9,6 +9,10 @@ public class Building : MonoBehaviour {
 	public float ysize = 80;
 	public GameObject soldier;
 	public float timeSpawn = 20;
+	public int life = 30;
+	public int goldPerSec = 5;
+
+	private int curLife;
 
 	float objY;
 	float count =0;
@@ -20,6 +24,7 @@ public class Building : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		curLife = life;
 		GameObject c = GameObject.FindGameObjectWithTag("Castle");
 		castle = (Castle) c.GetComponent("Castle");
 		objY = transform.position.y;
@@ -28,6 +33,11 @@ public class Building : MonoBehaviour {
 		transform.position = new Vector3(transform.position.x, transform.position.y-ysize, transform.position.z);
 		smokePart = (GameObject)Instantiate(smoke, new Vector3(transform.position.x+smoke.transform.position.x,smoke.transform.position.y,transform.position.z+smoke.transform.position.z), smoke.transform.rotation);
 		InvokeRepeating("spawnSoldier", timeBuild+timeSpawn,timeSpawn);
+		InvokeRepeating("addGold", timeBuild,1);
+	}
+
+	void addGold() {
+		castle.addGold(goldPerSec);
 	}
 	
 	// Update is called once per frame
@@ -47,9 +57,18 @@ public class Building : MonoBehaviour {
 	}
 	void spawnSoldier() {
 		if(soldierPart == null) {
-			soldierPart= (GameObject) Instantiate(soldier, transform.position, soldier.transform.rotation);
-			soldierPart.transform.localScale = new Vector3(10,10,10);
+			soldierPart= (GameObject) Instantiate(soldier, transform.position, soldier.transform.rotation);;
 			castle.addPeople(1);
+		}
+	}
+
+	public void hit( int dmg) {
+		curLife -= dmg;
+		if(curLife <= 0) {
+			//instanciar ruina/humo
+			gameObject.SetActive(false);
+			CancelInvoke();
+			transform.parent.gameObject.SendMessage("buildingHit");
 		}
 	}
 }
