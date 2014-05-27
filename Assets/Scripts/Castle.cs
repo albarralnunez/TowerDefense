@@ -7,22 +7,29 @@ public class Castle : MonoBehaviour {
 	public GameObject selection;
 	public int radius = 150;
 	public int townCost = 900;
-	public int hp = 20000;
-
+	public int life = 20000;
+	public GameObject healthBar;
 
 	int gold = 1000;
 	int people = 0;
-	int life;
+	int curLife;
+	HealthBar hbar;
 	GameObject selectionHighlight;
+	GameObject healthBarPart;
+
 
 	void Start() {
-		life = hp;
+		curLife = life;
 	}
 
 	void Awake () {
 		selectionHighlight = (GameObject) Instantiate(selection, new Vector3(transform.position.x-23, transform.position.y,transform.position.z), transform.rotation);
 		selectionHighlight.transform.localScale = new Vector3(radius, 1, radius);
 		selectionHighlight.SetActive(false);	
+		healthBarPart = (GameObject)Instantiate(healthBar, new Vector3(transform.position.x, healthBar.transform.position.y, transform.position.z), healthBar.transform.rotation);
+		healthBarPart.transform.parent = transform;
+		healthBarPart.SetActive(false);
+		hbar = (HealthBar) healthBarPart.GetComponent("HealthBar");
 	}
 	
 	public void setHighlight(bool active) {
@@ -45,15 +52,17 @@ public class Castle : MonoBehaviour {
 	}
 
 	public int getTotalHP() {
-		return hp;
-	}
-
-	public int getLife() {
 		return life;
 	}
 
+	public int getLife() {
+		return curLife;
+	}
+
 	public void hit(int attack) {
-		life -= attack;
+		curLife -= attack;
+		healthBarPart.SetActive(true);
+		hbar.setHP((float)curLife/(float)life);
 	}
 
 	public GameObject buildTown() {

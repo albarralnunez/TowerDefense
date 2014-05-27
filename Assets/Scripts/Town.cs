@@ -4,10 +4,11 @@ using System.Collections.Generic;
 
 public class Town : MonoBehaviour {
 
-	enum State {Constructing, Building, Attacking, Repairing, Waiting, Destroyed};
+	enum State {Building, Attacking, Repairing, Waiting, Destroyed};
 
 	public GameObject[] buildings;
 	public GameObject[] walls;
+	int wallUpgrade = 50;
 	public GameObject selection;
 	public GameObject floor;
 
@@ -16,10 +17,14 @@ public class Town : MonoBehaviour {
 	public int people = 5;
 	public int radius = 100;
 
+	public float secondsToRepair = 1;
+	public int healPower = 10;
+
 	public int[] levelReq;
 	Queue<GameObject> sideBuildings;
 	Queue<GameObject> wallsBuilt;
 
+	public bool needsRepairing = false;
 	int numhouses = 0;
 	float countAttack = 0;
 	int level =1;
@@ -30,7 +35,7 @@ public class Town : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		state = State.Constructing;
+		state = State.Waiting;
 		sideBuildings= new Queue<GameObject>();
 		wallsBuilt= new Queue<GameObject>();
 	}
@@ -38,16 +43,17 @@ public class Town : MonoBehaviour {
 	void Awake () {
 		floor = (GameObject) Instantiate (floor, transform.position, transform.rotation);
 		floor.transform.parent = transform;
-		selectionHighlight = (GameObject) Instantiate(selection, selection.transform.position, transform.rotation);
-		selectionHighlight.transform.parent = gameObject.transform;
-		selectionHighlight.transform.localScale = new Vector3(radius, 1, radius);
-		selectionHighlight.SetActive(false);	
+		floor.collider.enabled = false;	
 	}
 
 	public void startBuilding() {
 		Destroy(floor);
 		int indx = (int)Random.Range(0,buildings.Length);
 		++numhouses;
+		selectionHighlight = (GameObject) Instantiate(selection, new Vector3(transform.position.x+10, transform.position.y, transform.position.z+5), transform.rotation);
+		//selectionHighlight.transform.parent = gameObject.transform;
+		selectionHighlight.transform.localScale = new Vector3(radius, 1, radius);
+		selectionHighlight.SetActive(false);
 		GameObject building = (GameObject) Instantiate(buildings[indx], transform.position, buildings[indx].transform.rotation);
 		building.transform.parent = transform;
 		AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO!
@@ -100,7 +106,21 @@ public class Town : MonoBehaviour {
 				}
 			}
 		}
-		else if(state == State.Repairing) {}
+		else if(state == State.Repairing) {
+			timecont += Time.deltaTime;
+			if(timecont>= secondsToRepair) {
+				timecont =0;
+				bool found = false;
+				for(int i=0; i< transform.childCount && !found; ++i) {
+					Building b = (Building) transform.GetChild(i).gameObject.GetComponent("Building");
+					if(b.isHit) {
+						b.heal (healPower);
+						found = true;
+					}
+				}
+				if (!found) state = State.Building;
+			}
+		}
 		else if(state == State.Attacking) {
 			countAttack += Time.deltaTime;
 			if(countAttack >= 10) state= State.Repairing;
@@ -120,6 +140,11 @@ public class Town : MonoBehaviour {
 		countAttack =0;
 	}
 
+	public void buildingDestroyed() {
+		--numhouses;
+		needsRepairing = true;
+		if(numhouses<=0) state= State.Destroyed;
+	}
 
 	public int getRadius() {
 		return radius;
@@ -132,6 +157,10 @@ public class Town : MonoBehaviour {
 	public void wallLevelUp() {
 		++wallLevel; 
 		if(wallLevel>walls.Length) wallLevel = walls.Length;
+		for(int i=0; i< transform.childCount; ++i) {
+			Building b = (Building) transform.GetChild(i).gameObject.GetComponent("Building");
+			b.upgradeLife(wallUpgrade);
+		}
 		destroyWalls ();
 		buildWalls ();
 	}
@@ -140,6 +169,18 @@ public class Town : MonoBehaviour {
 		while(wallsBuilt.Count>0) {
 			Destroy (wallsBuilt.Dequeue());
 		}
+	}
+
+	public void rebuild() {
+		for(int i=0; i< transform.childCount; ++i) {
+			Building b = (Building) transform.GetChild(i).gameObject.GetComponent("Building");
+			if(b.isDestroyed) {
+				++numhouses;
+				b.rebuild();
+			}
+		}
+		needsRepairing = false;
+		state = State.Building;
 	}
 
 	void buildWalls() {

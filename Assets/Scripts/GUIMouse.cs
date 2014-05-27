@@ -5,7 +5,7 @@ public class GUIMouse : MonoBehaviour {
 	enum State {Town, Soldier, Castle ,Building, None};
 
 	GameObject last, construction;
-	Rect guiRect = new Rect (0,0,100,100);
+	Rect guiRect = new Rect (0,0,100,130);
 	Rect mainGuiRect = new Rect(Screen.width-200, 0, 200,30);
 
 	Castle castle;
@@ -31,7 +31,7 @@ public class GUIMouse : MonoBehaviour {
 				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 				RaycastHit hit;
 				if (Physics.Raycast (ray, out hit)) {
-					if(hit.collider.tag == "Terrain") construction.transform.position = new Vector3(hit.point.x, 	hit.point.y, hit.point.z);	
+					if(hit.collider.tag == "Terrain") construction.transform.position = new Vector3(hit.point.x-10,0, hit.point.z-5);	
 				}
 			}
 		}
@@ -74,6 +74,10 @@ public class GUIMouse : MonoBehaviour {
 						//last.transform.parent.Find ("defPos").Translate(hit.point);
 					}
 				}
+				if(hit.collider.tag == "Building") {
+					Building b = (Building)hit.collider.gameObject.GetComponent("Building");
+					b.hit (10);
+				}
 			}
 		}
 	}
@@ -93,6 +97,9 @@ public class GUIMouse : MonoBehaviour {
 				GUI.Label (new Rect (5, 20, 90, 30), t.getPeople () + " people");
 				GUI.Label (new Rect (5, 40, 90, 30), " gold/s");
 				if (GUI.Button (new Rect (5, 60, 90, 30), "Lvl+ Walls")) t.wallLevelUp ();
+				if(t.needsRepairing) {
+					if (GUI.Button (new Rect (5, 100, 90, 30), "Repair")) t.rebuild();
+				}
 			break;
 			case State.Soldier: 
 				GUI.Box (guiRect, "Soldier");

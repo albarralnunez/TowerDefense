@@ -11,8 +11,12 @@ namespace Pathfinding {
 		/** Animation component.
 		 * Should hold animations "awake" and "forward"
 		 */
-		public Animation anim;
-		public float distanceAlert = 200.0F;
+		//public Animation animRun;
+		//public Animation animAttack;
+		public Animator animRun;
+		public Animator animAttack;	
+		
+		public float distanceAlert;
 		/** Minimum velocity for moving */
 		public float sleepVelocity = 0.4F;
 
@@ -65,16 +69,11 @@ namespace Pathfinding {
 			defenseHighlight.SetActive(false);
 
 			//Prioritize the walking animation
-			anim["forward"].layer = 10;
+			//anim["iPi WithShield_Idle_O1"].layer = 10;
 			
 			//Play all animations
-			anim.Play ("awake");
-			anim.Play ("forward");
+			//animAttack.Play ("iPi ShieldPos_02");
 			
-			//Setup awake animations properties
-			anim["awake"].wrapMode = WrapMode.Clamp;
-			anim["awake"].speed = 0;
-			anim["awake"].normalizedTime = 1F;
 			//Call Start in base script (AIPath)
 			base.Start ();
 		}
@@ -111,7 +110,7 @@ namespace Pathfinding {
 			// loop through each tagged object, remembering nearest one found
 			foreach (GameObject obj in taggedGameObjects) {
 				Vector3 objectPos = obj.transform.position;
-				float distanceSqr = (objectPos - transform.position).sqrMagnitude;
+					float distanceSqr = (float)((objectPos - transform.position).sqrMagnitude);
 				Toolbox toolbox = Toolbox.Instance;
 				bool exists =  toolbox.EnemyBusy.Contains(obj.GetInstanceID());
 				if (distanceSqr < nearestDistanceSqr && distanceSqr <= distanceAlert && !exists) {
@@ -128,6 +127,12 @@ namespace Pathfinding {
 			curLife -= damage;
 		}
 
+		public void  OnTriggerEnter(Collider other) {
+			if(other.tag == "Enemy")
+				state = State.fight;
+			//other.SendMessage("SetToFight",gameObject);
+		}
+
 		protected new void Update () {
 			if (state == State.wait) {
 				if (!hunting) {
@@ -139,17 +144,13 @@ namespace Pathfinding {
 				} else {
 					if (targetObj != null) {
 						target = targetObj.transform;
-						float distanceSqr = (target.position - transform.position).sqrMagnitude;
-						if (distanceSqr < 5) {
-							state = State.fight;
-							targetObj.GetComponent<Pathfinding.MineBotAI> ().SetToFight (gameObject);
-						}
 					} else {
 						hunting = false;
 						target = defPosition;
+						//animAttack.Play ("iPi ShieldPos_02"); //TODO:
 					}
 				}
-
+				
 				//Get velocity in world-space
 				Vector3 velocity;
 				if (canMove) {
@@ -188,17 +189,17 @@ namespace Pathfinding {
 
 				if (velocity.sqrMagnitude <= sleepVelocity * sleepVelocity) {
 					//Fade out walking animation
-					anim.Blend ("forward", 0, 0.2F);
+//					anim.Blend ("walk", 0, 0.2F);  TODO:
 				} 
 				else {
 						//Fade in walking animation
-					anim.Blend ("forward", 1, 0.2F);
+//					anim.Blend ("walk", 1, 0.2F); //TODO:
 
 					//Modify animation speed to match velocity
-					AnimationState states = anim ["forward"];
+					//AnimationState states = animRun["iPi WithShield_RunForward_02"]; //TODO:
 
 					float speed = relVelocity.z;
-					states.speed = speed * animationSpeed;
+					//states.speed = speed * animationSpeed; TODO:
 				}
 			}
 			else if (state == State.fight) {
@@ -208,6 +209,7 @@ namespace Pathfinding {
 					targetObj.SendMessage("hit",damage);
 					attackTime = 0;
 				}
+				//animRun.Play("iPi WithShield_Multiple_03"); TODO:
 			}
 			if (life <= 0) {
 				Toolbox toolbox = Toolbox.Instance;

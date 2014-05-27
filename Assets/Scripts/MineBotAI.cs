@@ -27,13 +27,13 @@ namespace Pathfinding {
 		/** Animation component.
 		 * Should hold animations "awake" and "forward"
 		 */
-		public Animation anim;
+		//public Animation anim;
 		public float distanceAlert = 20.0F;
 		/** Minimum velocity for moving */
 		public float sleepVelocity = 0.4F;
 			
 		/** Speed relative to velocity with which to play animations */
-		public float animationSpeed = 0.2F;
+		//public float animationSpeed = 0.2F;
 		
 		/** Effect which will be instantiated when end of path is reached.
 		 * \see OnTargetReached */
@@ -69,17 +69,19 @@ namespace Pathfinding {
 			state = State.walk;
 
 			//Prioritize the walking animation
-			anim["forward"].layer = 10;
+/*
+			anim["zombie_running_2"].layer = 10;
 			
 			//Play all animations
-			anim.Play ("awake");
-			anim.Play ("forward");
+			anim.Play ("zombie_running_2");
 			
 			//Setup awake animations properties
-			anim["awake"].wrapMode = WrapMode.Clamp;
-			anim["awake"].speed = 0;
-			anim["awake"].normalizedTime = 1F;
+			anim["zombie_runinng_2"].wrapMode = WrapMode.Clamp;
+			anim["zombie_runinng_2"].speed = 0;
+			anim["zombie_runinng_2"].normalizedTime = 1F;
+*/
 			target = GameObject.Find("Target").transform;
+
 			//Call Start in base script (AIPath)
 			base.Start ();
 		}
@@ -166,24 +168,25 @@ namespace Pathfinding {
 					velocity = Vector3.zero;
 				}
 				//Animation
-	
+/*			
 				//Calculate the velocity relative to this transform's orientation
 				Vector3 relVelocity = tr.InverseTransformDirection (velocity);
 				relVelocity.y = 0;
-	
+				
 				if (velocity.sqrMagnitude <= sleepVelocity * sleepVelocity) {
 					//Fade out walking animation
-					anim.Blend ("forward", 0, 0.2F);
+					anim.Blend ("zombie_running_2", 0, 0.2F);
 				} else {
 					//Fade in walking animation
-					anim.Blend ("forward", 1, 0.2F);
+					anim.Blend ("zombie_running_2", 1, 0.2F);
 	
 					//Modify animation speed to match velocity
-					AnimationState statea = anim ["forward"];
-	
+					AnimationState statea = anim ["zombie_running_2"];
+		
 					float speed = relVelocity.z;
 					statea.speed = speed * animationSpeed;
 				}
+*/
 			} 
 			else if (state == State.fight) {
 				attackTime += Time.deltaTime;
@@ -191,10 +194,15 @@ namespace Pathfinding {
 				else if (attackSpeed <= attackTime) {
 					attacker.SendMessage("hit",damage);
 					attackTime = 0;
-					if(attacker.activeSelf == false) {
-						attacker = null;
-						state = State.walk;
+/*
+					if(attacker.tag = "building" ) {
+						Building b = (Building) attacker.GetComponent("Building");
+						if(b.isBuildingDestroyed()) {
+							attacker = null;
+							state = State.walk;
+						}
 					}
+*/
 				}
 			}
 			if (life <= 0) {
