@@ -6,11 +6,11 @@ public class Castle : MonoBehaviour {
 	public GameObject town;
 	public GameObject selection;
 	public int radius = 150;
-	public int townCost = 900;
 	public int life = 20000;
 	public GameObject healthBar;
-
+	public int lvlWalls =1;
 	int gold = 1000;
+	int goldPerSec = 5;
 	int people = 0;
 	int curLife;
 	HealthBar hbar;
@@ -30,6 +30,7 @@ public class Castle : MonoBehaviour {
 		healthBarPart.transform.parent = transform;
 		healthBarPart.SetActive(false);
 		hbar = (HealthBar) healthBarPart.GetComponent("HealthBar");
+		InvokeRepeating("addGold",0f,1f);
 	}
 	
 	public void setHighlight(bool active) {
@@ -41,6 +42,13 @@ public class Castle : MonoBehaviour {
 	}
 	public int getPeople() {
 		return people;
+	}
+	public int getGoldPerSec(){
+		return goldPerSec;
+	}
+
+	void addGold(){
+		gold += goldPerSec;
 	}
 
 	public void addPeople(int peopl) {
@@ -55,6 +63,13 @@ public class Castle : MonoBehaviour {
 		return life;
 	}
 
+	public void upgradeLife(int up) {
+		++lvlWalls;
+		life += up;
+		curLife +=up;
+		hbar.setHP((float)curLife/(float)life);
+	}
+
 	public int getLife() {
 		return curLife;
 	}
@@ -66,10 +81,7 @@ public class Castle : MonoBehaviour {
 	}
 
 	public GameObject buildTown() {
-		if((gold-townCost)>=0) {
-			gold -= townCost;
-			return (GameObject) Instantiate (town , new Vector3(0,0,0), town.transform.rotation);
-		}else return null;
+		return (GameObject) Instantiate (town , new Vector3(0,0,0), town.transform.rotation);
 	}
 	
 }
