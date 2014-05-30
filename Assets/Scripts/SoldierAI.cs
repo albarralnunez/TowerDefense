@@ -2,6 +2,7 @@
 using System.Collections;
 using Pathfinding.RVO;
 using System;
+using System.Collections.Generic;
 
 namespace Pathfinding {
 	[RequireComponent(typeof(Seeker))]
@@ -13,8 +14,7 @@ namespace Pathfinding {
 		 */
 		//public Animation animRun;
 		//public Animation animAttack;
-		public Animator animRun;
-		public Animator animAttack;	
+		private Animator anim;
 		
 		public float distanceAlert;
 		/** Minimum velocity for moving */
@@ -43,37 +43,48 @@ namespace Pathfinding {
 
 		private float attackTime;
 
+		private GameObject attacker;		
+
 		public int getTotalHP() {return life;}
 
 		public int getLife() { return curLife;}
+
+		private List<GameObject> enemys;		
+
+		private Transform posAnim;
 
 		public void setHighlight(bool active) {
 			selectionHighlight.SetActive(active);
 			defenseHighlight.SetActive(active);
 		}
-		
+
+		public void add(GameObject a) {
+			enemys.Add(a);
+		}
+
+		public void erase(GameObject a) {
+			enemys.Remove(a);
+		}
+
 		public new void Start () {
 			curLife = life;
+			posAnim = transform.FindChild("ChainMail_Knight");
+			enemys = new List<GameObject>();
 			selectionHighlight = 
 				(GameObject)Instantiate (Resources.Load ("Highlight"), gameObject.transform.position - new Vector3(0.0F,0.8F,0.0F), Quaternion.identity);
 			selectionHighlight.transform.parent = transform;
-			//selectionHighlight.renderer.sharedMaterial.color = Color.blue;
 			selectionHighlight.transform.localScale = new Vector3(alertHiglight, 1, alertHiglight);
 			selectionHighlight.SetActive(false);
 
 			defenseHighlight = 
 				(GameObject)Instantiate (Resources.Load ("HighlightDef"), transform.parent.Find ("defPos").transform.position - new Vector3(0.0F,0.8F,0.0F),Quaternion.identity);
 			defenseHighlight.transform.parent = transform.parent.Find ("defPos");
-			//defenseHighlight.renderer.sharedMaterial.color = Color.green;
 			defenseHighlight.transform.localScale = new Vector3(3, 1, 3);
 			defenseHighlight.SetActive(false);
 
-			//Prioritize the walking animation
-			//anim["iPi WithShield_Idle_O1"].layer = 10;
-			
-			//Play all animations
-			//animAttack.Play ("iPi ShieldPos_02");
-			
+
+			anim = gameObject.GetComponentInChildren<Animator>();			
+
 			//Call Start in base script (AIPath)
 			base.Start ();
 		}
@@ -105,6 +116,7 @@ namespace Pathfinding {
 			
 			float nearestDistanceSqr = Mathf.Infinity;
 			GameObject[] taggedGameObjects = GameObject.FindGameObjectsWithTag("Enemy"); 
+			
 			GameObject nearestObj = null;
 			
 			// loop through each tagged object, remembering nearest one found
@@ -127,16 +139,25 @@ namespace Pathfinding {
 			curLife -= damage;
 		}
 
-		public void  OnTriggerEnter(Collider other) {
+
+		/*public void  OnCollisionEnter(Collider other) {
 			if(other.tag == "Enemy")
 				state = State.fight;
-			//other.SendMessage("SetToFight",gameObject);
-		}
+				attacker = other.gameObject;
+				//other.gameObject.SendMessage("SetToFight",gameObject);
+		}*/
 
+		public void SetToFight (GameObject a) {
+			a.SendMessage("SetToFithg", gameObject);
+			state = State.fight;
+			attacker = a;
+		}
+			
 		protected new void Update () {
+
 			if (state == State.wait) {
 				if (!hunting) {
-					targetObj = GetNearestTaggedObject ();
+					targetObj = GetNearestTaggedObject();
 					if (defPosition != gameObject.transform && targetObj == null)
 							defPosition = transform.parent.Find ("defPos").transform;
 					//GameObject.Find("Soldier/defPos").GetComponent<Transform>().transform;
@@ -147,7 +168,7 @@ namespace Pathfinding {
 					} else {
 						hunting = false;
 						target = defPosition;
-						//animAttack.Play ("iPi ShieldPos_02"); //TODO:
+						anim.SetFloat("Axis_Vertical",0);
 					}
 				}
 				
@@ -189,31 +210,30 @@ namespace Pathfinding {
 
 				if (velocity.sqrMagnitude <= sleepVelocity * sleepVelocity) {
 					//Fade out walking animation
-//					anim.Blend ("walk", 0, 0.2F);  TODO:
+					anim.SetFloat("Axis_Vertical",0);
 				} 
 				else {
-						//Fade in walking animation
-//					anim.Blend ("walk", 1, 0.2F); //TODO:
-
-					//Modify animation speed to match velocity
-					//AnimationState states = animRun["iPi WithShield_RunForward_02"]; //TODO:
-
 					float speed = relVelocity.z;
-					//states.speed = speed * animationSpeed; TODO:
+					anim.SetFloat("Axis_Vertical",speed);// * animationSpeed);
+					posAnim.position = transform.position;
 				}
 			}
 			else if (state == State.fight) {
 				attackTime += Time.deltaTime;
-				if (target == null) state = State.wait;
-				else if (attackSpeed <= attackTime) {
-					targetObj.SendMessage("hit",damage);
-					attackTime = 0;
+				if (target == null) {
+					state = State.wait;
+					anim.SetBool("LeftMouseClick",false);
 				}
-				//animRun.Play("iPi WithShield_Multiple_03"); TODO:
+				else if (attackSpeed <= attackTime) {
+					attacker.SendMessage("hit",damage);
+					attackTime = 0;
+					anim.SetBool("LeftMouseClick",true);
+				}
 			}
 			if (life <= 0) {
 				Toolbox toolbox = Toolbox.Instance;
 				toolbox.EnemyBusy.Remove (targetObj.GetInstanceID ());
+				enemys.Remove(targetObj);
 				Destroy(transform.parent.gameObject);
 			}
 		}

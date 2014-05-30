@@ -134,7 +134,7 @@ namespace Pathfinding {
 			}
 			return nearestObj;
 		}
-
+	
 		protected new void Update () {
 			if (state == State.walk) {
 				target = GameObject.Find("Target").transform;
@@ -167,26 +167,6 @@ namespace Pathfinding {
 				else {
 					velocity = Vector3.zero;
 				}
-				//Animation
-/*			
-				//Calculate the velocity relative to this transform's orientation
-				Vector3 relVelocity = tr.InverseTransformDirection (velocity);
-				relVelocity.y = 0;
-				
-				if (velocity.sqrMagnitude <= sleepVelocity * sleepVelocity) {
-					//Fade out walking animation
-					anim.Blend ("zombie_running_2", 0, 0.2F);
-				} else {
-					//Fade in walking animation
-					anim.Blend ("zombie_running_2", 1, 0.2F);
-	
-					//Modify animation speed to match velocity
-					AnimationState statea = anim ["zombie_running_2"];
-		
-					float speed = relVelocity.z;
-					statea.speed = speed * animationSpeed;
-				}
-*/
 			} 
 			else if (state == State.fight) {
 				attackTime += Time.deltaTime;
@@ -205,6 +185,7 @@ namespace Pathfinding {
 */
 				}
 			}
+
 			if (life <= 0) {
 				Toolbox toolbox = Toolbox.Instance;
 				toolbox.EnemyBusy.Remove (gameObject.GetInstanceID ());
@@ -213,7 +194,7 @@ namespace Pathfinding {
 		}
 
 		//a la ke choque con un soldier, un building o un castle lo atacara
-		void OnTriggerEnter(Collider col) {
+		void OnCollisionEnter(Collider col) {
 			if(col.tag == "Soldier"||col.tag=="Building" || col.tag == "Castle") {
 				SetToFight (col.gameObject);
 			}
