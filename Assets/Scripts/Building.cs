@@ -15,8 +15,7 @@ public class Building : MonoBehaviour {
 	public int goldPerSec = 5;
 
 	private int curLife;
-
-	float objY;
+	
 	float count =0;
 
 	public bool isDestroyed, isHit;
@@ -36,7 +35,6 @@ public class Building : MonoBehaviour {
 		curLife = life;
 		GameObject c = GameObject.FindGameObjectWithTag("Castle");
 		castle = (Castle) c.GetComponent("Castle");
-		objY = transform.position.y;
 		floorPart = (GameObject)Instantiate(floor, new Vector3(transform.position.x+floor.transform.position.x,floor.transform.position.y-ysize,transform.position.z+floor.transform.position.z), floor.transform.rotation);
 		floorPart.transform.parent = transform;
 		healthBarPart = (GameObject)Instantiate(healthBar, new Vector3(transform.position.x+10, healthBar.transform.position.y, transform.position.z+5), healthBar.transform.rotation);
@@ -46,6 +44,11 @@ public class Building : MonoBehaviour {
 		transform.position = new Vector3(transform.position.x, transform.position.y-ysize, transform.position.z);
 		smokePart = (GameObject)Instantiate(smoke, new Vector3(transform.position.x+smoke.transform.position.x,smoke.transform.position.y,transform.position.z+smoke.transform.position.z), smoke.transform.rotation);
 		InvokeRepeating("spawnSoldier", timeBuild+timeSpawn,timeSpawn);
+		InvokeRepeating("addGold", timeBuild,1);
+	}
+
+	void addGold() {
+		castle.addGold(goldPerSec);
 	}
 
 	// Update is called once per frame

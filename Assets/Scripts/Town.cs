@@ -28,9 +28,10 @@ public class Town : MonoBehaviour {
 	int numhouses = 0;
 	float countAttack = 0;
 	int level =1;
-	int wallLevel =0;
+	public int wallLevel =0;
 	float timecont =0;
 	GameObject selectionHighlight;
+	int goldPerSec=0;
 	State state;
 
 	// Use this for initialization
@@ -46,29 +47,37 @@ public class Town : MonoBehaviour {
 		floor.collider.enabled = false;	
 	}
 
+	public int getHousesDestroyed() {
+		return transform.childCount-numhouses;
+	}
+
 	public void startBuilding() {
 		Destroy(floor);
 		int indx = (int)Random.Range(0,buildings.Length);
 		++numhouses;
-		selectionHighlight = (GameObject) Instantiate(selection, new Vector3(transform.position.x+10, transform.position.y, transform.position.z+5), transform.rotation);
+		selectionHighlight = (GameObject) Instantiate(selection, transform.position, transform.rotation);
 		//selectionHighlight.transform.parent = gameObject.transform;
 		selectionHighlight.transform.localScale = new Vector3(radius, 1, radius);
 		selectionHighlight.SetActive(false);
-		GameObject building = (GameObject) Instantiate(buildings[indx], transform.position, buildings[indx].transform.rotation);
+		GameObject building = (GameObject) Instantiate(buildings[indx], new Vector3(transform.position.x-10, transform.position.y, transform.position.z-5), buildings[indx].transform.rotation);
 		building.transform.parent = transform;
 		AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO!
 		sideBuildings.Enqueue(building);
 		state = State.Building;
+		Building bld = (Building)building.GetComponent("Building");
+		goldPerSec = bld.goldPerSec; 
 	}
 
 	void Update () {
 		if(state == State.Building) {
 			timecont += Time.deltaTime;
 			if(timecont>= secondsToBuild) {
+				Queue<GameObject> sideBuildingsAux = new Queue<GameObject>();
 				timecont = 0;
 				Vector3 pos = new Vector3(0,0,0);
 				bool found = false;
-				while(!found) {
+				while(!found && sideBuildings.Count>0) {
+					bool obstacle =false;
 					GameObject sideBuilding = sideBuildings.Peek();
 					for(int i=0; i< 4 && !found; ++i) {
 						pos = sideBuilding.transform.position;
@@ -83,8 +92,15 @@ public class Town : MonoBehaviour {
 							Vector3 posch = transform.GetChild(j).position;
 							if(pos.x == posch.x && pos.z == posch.z) found = false;
 						}
+						if(found && !canBuild(pos)){
+							found =false;
+							obstacle = true;
+						}
 					}
-					if(!found) sideBuildings.Dequeue();
+					if(!found) {
+						if(obstacle)sideBuildingsAux.Enqueue(sideBuildings.Peek());
+						sideBuildings.Dequeue();
+					}
 					else {
 						int b = Random.Range(0,buildings.Length);
 						++numhouses;
@@ -100,6 +116,7 @@ public class Town : MonoBehaviour {
 						}
 					}
 				}
+				for(int i=0; i<sideBuildingsAux.Count;++i) sideBuildings.Enqueue(sideBuildingsAux.Dequeue());
 				if(wallLevel>0) {
 					destroyWalls();
 					buildWalls();
@@ -127,6 +144,17 @@ public class Town : MonoBehaviour {
 		}
 	}
 
+	bool canBuild(Vector3 pos){
+		pos = new Vector3(pos.x, pos.y+500, pos.z);
+		Vector3 down = transform.TransformDirection(Vector3.down);
+		RaycastHit hit;
+		Debug.DrawRay(pos, down*1000, Color.white, 20f, true);
+		if (Physics.Raycast(pos, down, out hit)){
+			if(hit.point.y > 0)return false;
+		}
+		return true;
+	}
+
 	public void setHighlight(bool active) {
 		selectionHighlight.SetActive(active);
 	}
@@ -150,8 +178,14 @@ public class Town : MonoBehaviour {
 		return radius;
 	}
 
-	public int getPeople() {
-		return Mathf.Max(people, people+transform.childCount-2);
+	public int getHouses() {
+		if(state == State.Building) return numhouses-1;
+		else return numhouses;
+	}
+
+	public int getIncome() {
+		if(state == State.Building) return (numhouses-1)*goldPerSec;
+		else return numhouses*goldPerSec;
 	}
 
 	public void wallLevelUp() {
