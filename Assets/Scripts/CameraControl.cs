@@ -16,7 +16,7 @@ public class CameraControl : MonoBehaviour {
 	
 	public Vector4 limits;
 	
-	Vector3 pos = new Vector3(-5,0,-490);
+	public Vector3 pos = new Vector3(-5,0,-490);
 	Vector3 rot = new Vector3(70, 0, 0);
 	Vector2 pre = new Vector2(-1,-1);
 	

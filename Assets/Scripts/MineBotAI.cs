@@ -50,11 +50,12 @@ namespace Pathfinding {
 		private GameObject attacker;
 		private GameObject healthBarPart;
 		private HealthBar hbar;
-
+		public Animator anim;
 		
 
 		public void SetToFight(GameObject a) {
 			state = State.fight;
+			anim.SetBool("Fight",true);
 			attacker = a;
 		}
 
@@ -151,7 +152,10 @@ namespace Pathfinding {
 			} 
 			else if (state == State.fight) {
 				attackTime += Time.deltaTime;
-				if (attacker  == null) state = State.walk;
+				if (attacker  == null) {
+					state = State.walk;
+					anim.SetBool("Fight",false);
+				}
 				else if (attackSpeed <= attackTime) {
 					attacker.SendMessage("hit",damage);
 					attackTime = 0;

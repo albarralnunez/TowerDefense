@@ -223,12 +223,12 @@ namespace Pathfinding {
 				anim.SetFloat("Axis_Vertical",0);
 				if (target == null) {
 					state = State.wait;
-					anim.SetBool("RightMouseClick",false);
+					anim.SetBool("LeftMouseClick",false);
 				}
 				else if (attackSpeed <= attackTime) {
 					attacker.SendMessage("hit",damage);
 					attackTime = 0;
-					anim.SetBool("RightMouseClick",true);
+					anim.SetBool("LeftMouseClick",true);
 				}
 			}
 			if (life <= 0) {
