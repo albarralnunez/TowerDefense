@@ -16,7 +16,7 @@ public class Seeker : MonoBehaviour {
 	//====== SETTINGS ======
 	
 	/* Recalculate last queried path when a graph changes. \see AstarPath.OnGraphsUpdated */
-	//public bool recalcOnGraphChange = true;
+	public bool recalcOnGraphChange = true;
 	
 	public bool drawGizmos = true;
 	public bool detailedGizmos = false;
