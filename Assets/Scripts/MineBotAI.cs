@@ -38,8 +38,13 @@ namespace Pathfinding {
 		/** Effect which will be instantiated when end of path is reached.
 		 * \see OnTargetReached */
 		public GameObject endOfPathEffect;
+
 		public GameObject healthBar;
 		public GameObject body;
+
+
+		public GameObject healthBar;
+
 		public int life;
 		public int damage;
 		public int attackSpeed;
@@ -50,6 +55,8 @@ namespace Pathfinding {
 		private GameObject attacker;
 		private GameObject healthBarPart;
 		private HealthBar hbar;
+
+		
 
 		public void SetToFight(GameObject a) {
 			state = State.fight;
@@ -85,18 +92,6 @@ namespace Pathfinding {
 			attackTime = 0;
 			state = State.walk;
 
-			//Prioritize the walking animation
-/*
-			anim["zombie_running_2"].layer = 10;
-			
-			//Play all animations
-			anim.Play ("zombie_running_2");
-			
-			//Setup awake animations properties
-			anim["zombie_runinng_2"].wrapMode = WrapMode.Clamp;
-			anim["zombie_runinng_2"].speed = 0;
-			anim["zombie_runinng_2"].normalizedTime = 1F;
-*/
 			target = GameObject.Find("Target").transform;
 
 			//Call Start in base script (AIPath)
@@ -127,30 +122,6 @@ namespace Pathfinding {
 		{
 			return tr.position;	
 		}
-
-		/*private Transform GetNearestTaggedObject(){
-			// and finally the actual process for finding the nearest object:
-			
-			float nearestDistanceSqr = Mathf.Infinity;
-			GameObject[] taggedGameObjects = GameObject.FindGameObjectsWithTag("Ally"); 
-			Transform nearestObj = null;
-			
-			// loop through each tagged object, remembering nearest one found
-			foreach (GameObject obj in taggedGameObjects) {
-				Vector3 objectPos = obj.transform.position;
-				float distanceSqr = (objectPos - transform.position).sqrMagnitude;
-				//get Ally state fighting
-				//Pathfinding.SoldierAI comp = obj.GetComponent<Pathfinding.SoldierAI>();
- 				if (distanceSqr < nearestDistanceSqr && distanceSqr <= distanceAlert){
-					nearestObj = obj.transform;
-					nearestDistanceSqr = distanceSqr;
-				}
-			}
-			if (nearestObj == null) {
-				return GameObject.Find("Target").transform;
-			}
-			return nearestObj;
-		}*/
 	
 		protected new void Update () {
 			healthBarPart.transform.position = new Vector3(transform.position.x, healthBar.transform.position.y, transform.position.z);
