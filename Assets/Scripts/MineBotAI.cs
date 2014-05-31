@@ -194,7 +194,7 @@ namespace Pathfinding {
 		}
 
 		//a la ke choque con un soldier, un building o un castle lo atacara
-		void OnCollisionEnter(Collider col) {
+		void OnTriggerEnter(Collider col) {
 			if(col.tag == "Soldier"||col.tag=="Building" || col.tag == "Castle") {
 				SetToFight (col.gameObject);
 			}
