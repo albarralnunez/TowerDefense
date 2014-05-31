@@ -148,7 +148,7 @@ namespace Pathfinding {
 		}
 
 		public void SetToFight (GameObject a) {
-			a.SendMessage("SetToFithg", gameObject);
+			a.SendMessage("SetToFight", gameObject);
 			state = State.fight;
 			attacker = a;
 		}
@@ -220,14 +220,15 @@ namespace Pathfinding {
 			}
 			else if (state == State.fight) {
 				attackTime += Time.deltaTime;
+				anim.SetFloat("Axis_Vertical",0);
 				if (target == null) {
 					state = State.wait;
-					anim.SetBool("LeftMouseClick",false);
+					anim.SetBool("RightMouseClick",false);
 				}
 				else if (attackSpeed <= attackTime) {
 					attacker.SendMessage("hit",damage);
 					attackTime = 0;
-					anim.SetBool("LeftMouseClick",true);
+					anim.SetBool("RightMouseClick",true);
 				}
 			}
 			if (life <= 0) {

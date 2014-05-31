@@ -15,7 +15,7 @@ public class Town : MonoBehaviour {
 	public float spaceBetweenBuildings = 15;
 	public float secondsToBuild = 10;
 	public int people = 5;
-	public int radius = 100;
+	public float radius = 100;
 
 	public float secondsToRepair = 1;
 	public int healPower = 10;
@@ -174,7 +174,7 @@ public class Town : MonoBehaviour {
 		if(numhouses<=0) state= State.Destroyed;
 	}
 
-	public int getRadius() {
+	public float getRadius() {
 		return radius;
 	}
 

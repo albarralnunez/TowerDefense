@@ -176,7 +176,7 @@ namespace Pathfinding {
 
 		//a la ke choque con un soldier, un building o un castle lo atacara
 		void OnTriggerEnter(Collider col) {
-			if(col.tag == "Soldier"||col.tag=="Building" || col.tag == "Castle") {
+			if(col.tag=="Building" || col.tag == "Castle") {
 				SetToFight (col.gameObject);
 			}
 		}

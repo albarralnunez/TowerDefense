@@ -68,7 +68,12 @@ public class Building : MonoBehaviour {
 	}
 	void spawnSoldier() {
 		if(soldierPart == null) {
-			soldierPart= (GameObject) Instantiate(soldier, transform.position, soldier.transform.rotation);;
+			Town tr = (Town)transform.parent.GetComponentInChildren<Town>();
+			float xx = (float)Random.Range(-tr.getRadius(),tr.getRadius()); 
+			float yy = (float)Random.Range(-tr.getRadius(),tr.getRadius());
+			Vector3 aux = new Vector3(xx,0,yy);
+			soldierPart= (GameObject) Instantiate(soldier, transform.position, soldier.transform.rotation);
+			soldierPart.transform.FindChild("defPos").transform.position =  tr.transform.position+aux;
 			castle.addPeople(1);
 		}
 	}
@@ -102,7 +107,7 @@ public class Building : MonoBehaviour {
 	}
 
 	public void heal(int dmg) {
-		curLife +=dmg;
+		curLife+=dmg;
 		hbar.setHP((float)curLife/(float)life);
 		if(curLife >= life) {
 			curLife = life;
