@@ -38,7 +38,7 @@ namespace Pathfinding {
 		/** Effect which will be instantiated when end of path is reached.
 		 * \see OnTargetReached */
 		public GameObject endOfPathEffect;
-
+		
 
 		public int life;
 		public int damage;
@@ -48,6 +48,8 @@ namespace Pathfinding {
 		private int curLife;
 		private float attackTime;
 		private GameObject attacker;
+
+		
 
 		public void SetToFight(GameObject a) {
 			state = State.fight;
@@ -67,7 +69,7 @@ namespace Pathfinding {
 			curLife = life;
 			attackTime = 0;
 			state = State.walk;
-
+			
 			//Prioritize the walking animation
 /*
 			anim["zombie_running_2"].layer = 10;
