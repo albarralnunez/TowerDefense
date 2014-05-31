@@ -43,8 +43,6 @@ namespace Pathfinding {
 		public GameObject body;
 
 
-		public GameObject healthBar;
-
 		public int life;
 		public int damage;
 		public int attackSpeed;
