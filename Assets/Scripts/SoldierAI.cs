@@ -140,12 +140,12 @@ namespace Pathfinding {
 		}
 
 
-		/*public void  OnCollisionEnter(Collider other) {
+		public void  OnTrigerEnter(Collider other) {
 			if(other.tag == "Enemy")
 				state = State.fight;
 				attacker = other.gameObject;
 				//other.gameObject.SendMessage("SetToFight",gameObject);
-		}*/
+		}
 
 		public void SetToFight (GameObject a) {
 			a.SendMessage("SetToFithg", gameObject);
