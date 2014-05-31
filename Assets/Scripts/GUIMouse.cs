@@ -2,12 +2,13 @@ using UnityEngine;
 using System.Collections;
 
 public class GUIMouse : MonoBehaviour {
-	enum State {Town, Soldier, Castle ,Building, Tower, None};
+	enum State {Town, Soldier, Castle ,Building, Tower, Win, Lose, None};
 
 	GameObject last, construction;
 	Rect guiRect = new Rect (0,0,140,140);
 	Rect mainGuiRect = new Rect(Screen.width-200, 0, 200,30);
-
+	Rect mainGuiRect2 = new Rect(Screen.width-100, 31, 100,30);
+	
 	Rect attrRect = new Rect (5,20,130,45);
 	Rect attr1Rect = new Rect (10, 20, 130, 22);
 	Rect attr2Rect = new Rect (10, 40, 130, 22);
@@ -25,8 +26,10 @@ public class GUIMouse : MonoBehaviour {
 	bool pause = false;
 	CameraControl cam;
 	private State state;
+	WaveControll wc;
 
 	void Start () {
+		wc = (WaveControll) gameObject.GetComponent("WaveControll");
 		GameObject go = (GameObject) GameObject.FindGameObjectWithTag("Castle");
 		GameObject camera = (GameObject) GameObject.FindGameObjectWithTag("MainCamera");
 		cam = (CameraControl) camera.GetComponent("CameraControl");
@@ -37,6 +40,16 @@ public class GUIMouse : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if(castle.getLife()<=0) {
+			state = State.Lose;
+			cam.enabled = false;
+			Time.timeScale = 0;
+		}
+		else if(wc.curWave> wc.totalWaves) {
+			state = State.Win;
+			cam.enabled = false;
+			Time.timeScale = 0;
+		}
 		if(Input.GetKeyUp(KeyCode.Escape)) {
 			pause = !pause;
 			if(pause) {
@@ -120,116 +133,143 @@ public class GUIMouse : MonoBehaviour {
 	}
 
 	void OnGUI () {
-		GUI.Box (mainGuiRect, "Gold: " + castle.getGold () + "    People: " + castle.getPeople());
-		if(pause) {
-			GUI.Box (new Rect(0,0,Screen.width, Screen.height), "");
-			GUI.Box (new Rect((Screen.width-200)/2,(Screen.height-150)/2,200, 150),"PAUSED");
-			if (GUI.Button (new Rect((Screen.width-195)/2,(Screen.height-150)/2+40,193, 50), "Resume")){
-				cam.enabled = true;
-				Time.timeScale = 1;
-				pause = false;
+		if(state!= State.Win && state != State.Lose) {
+			GUI.Box (mainGuiRect, "Gold: " + castle.getGold () + "    People: " + castle.getPeople());
+			GUI.Box (mainGuiRect2, "Wave: " + wc.curWave + " / " + wc.totalWaves);
+			if(pause) {
+				GUI.Box (new Rect(0,0,Screen.width, Screen.height), "");
+				GUI.Box (new Rect((Screen.width-200)/2,(Screen.height-150)/2,200, 150),"PAUSED");
+				if (GUI.Button (new Rect((Screen.width-195)/2,(Screen.height-150)/2+40,193, 50), "Resume")){
+					cam.enabled = true;
+					Time.timeScale = 1;
+					pause = false;
+				}
+				if (GUI.Button (new Rect((Screen.width-195)/2,(Screen.height-150)/2+95,193, 50), "Exit to Menu")){
+					Time.timeScale = 1;
+					Application.LoadLevel("menu");
+				}
 			}
-			if (GUI.Button (new Rect((Screen.width-195)/2,(Screen.height-150)/2+95,193, 50), "Exit to Menu")){
-				Time.timeScale = 1;
-				Application.LoadLevel("menu");
+			else {
+				switch (state) {
+				case State.Tower:
+					Tower tw = (Tower)last.GetComponent ("Tower");
+					GUI.Box (guiRect, "TOWER");
+					GUI.Box (attrRect,"");
+					GUI.Label (attr1Rect, "Hp: " + tw.getLife() + " / " + tw.getHP());
+					GUI.Label (attr2Rect, "Attack: " + tw.dmg + " /s");
+					GUI.Box (upgradesRect,"");
+					if (GUI.Button (upgrade1Rect, new GUIContent ("Upgrade Tower", "1"))) {
+						if(castle.getGold() >= 2500 + 5000*tw.lvl) {
+							castle.addGold(-2500+ 5000*tw.lvl);
+							tw.levelUp();
+						}
+					}
+					if(castle.getGold() < 2500+ 5000*tw.lvl) GUI.Box (upgrade1Rect,"");
+					if (GUI.Button (upgrade2Rect, new GUIContent ("Destroy", "2"))){
+					}
+					if(GUI.tooltip == "1") {
+						GUI.Box (tooltipRect, "Cost: " + (2500 + 5000*tw.lvl) +" gold");
+						GUI.Label(tooltipRect2, "The tower becomes stronger. (+50hp, +10 attack");
+					}
+					else if(GUI.tooltip == "2") {
+						GUI.Box (tooltipRect, "Cost: 0 gold");
+						GUI.Label(tooltipRect2, "Destroys the tower.");
+					}
+					break;
+				case State.Town:
+					Town t = (Town)last.GetComponent ("Town");
+					GUI.Box (guiRect, "TOWN");
+					GUI.Box (attrRect,"");
+					GUI.Label (attr1Rect, "Size: "+ t.getHouses() + " houses");
+					GUI.Label (attr2Rect, "Income: "+ t.getIncome() +" gold/s");
+					GUI.Box (upgradesRect,"");
+					if (GUI.Button (upgrade1Rect, new GUIContent ("Upgrade Walls", "1"))) {
+						if(castle.getGold() >= 2500*(t.wallLevel+1)) {
+							castle.addGold(-2500*(t.wallLevel+1));
+							t.wallLevelUp ();
+						}
+					}
+					if(castle.getGold() < 2500*(t.wallLevel+1)) GUI.Box (upgrade1Rect,"");
+				    if (GUI.Button (upgrade2Rect, new GUIContent ("Repair", "2"))) {
+					if(castle.getGold() >= 500*t.getHousesDestroyed()) {
+							castle.addGold(-500*t.getHousesDestroyed());
+							t.rebuild();
+						}	
+					}
+					if(!t.needsRepairing || castle.getGold() <500*t.getHousesDestroyed()) GUI.Box (upgrade2Rect,"");
+					if(GUI.tooltip == "1") {
+					GUI.Box (tooltipRect, "Cost: " + 2500*(t.wallLevel+1) + " gold");
+						GUI.Label(tooltipRect2, "Your town walls will be upgraded. (+50Hp)");
+					}
+					else if(GUI.tooltip == "2") {
+						GUI.Box (tooltipRect, "Cost: " + 500*t.getHousesDestroyed() +" gold");
+						GUI.Label(tooltipRect2, "Repair all the destroyed houses in your town.");
+					}
+				break;
+				case State.Soldier: 
+					Pathfinding.SoldierAI sai = (Pathfinding.SoldierAI) last.GetComponent ("SoldierAI");
+					GUI.Box (guiRect, "SOLDIER");
+					GUI.Box (attrRect,"");
+					GUI.Label (attr1Rect, (sai.getLife()).ToString() + " / " + (sai.getTotalHP()).ToString());
+					GUI.Box (upgradesRect,"");
+					if (GUI.Button (upgrade1Rect, new GUIContent ("Build Tower", "1"))){}
+					if(GUI.tooltip == "1") {
+						GUI.Box (tooltipRect, "Cost: 200 gold");
+						GUI.Label(tooltipRect2, "The tower will shoot the enemies, but it needs the soldier.");
+					}
+				break;
+				case State.Castle:
+					GUI.Box (guiRect, "CASTLE");
+					GUI.Box (attrRect,"");
+					GUI.Label (attr1Rect, "Hp: "+(castle.getLife()).ToString() + " / " + (castle.getTotalHP()).ToString());
+					GUI.Label (attr2Rect, "Income: "+(castle.getGoldPerSec()).ToString() + " gold/s");
+					GUI.Box (upgradesRect,"");
+					if (GUI.Button (upgrade1Rect, new GUIContent ("Build Town", "1"))){
+						if(castle.getGold() >= 1000+(5000*numTowns)) {
+							castle.addGold(-1000+(5000*numTowns));
+							construction = castle.buildTown();
+							state = State.Building;
+							Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+							construction.transform.position = new Vector3(pos.x, 0, pos.z);
+							++numTowns;
+						}
+					}
+					if(castle.getGold() < 1000+(5000*numTowns)) GUI.Box (upgrade1Rect,"");
+					if (GUI.Button (upgrade2Rect, new GUIContent ("Upgrade Walls", "2"))){
+						if(castle.getGold() >= 5000*castle.lvlWalls) {
+							castle.addGold(-5000*castle.lvlWalls);
+							castle.upgradeLife(200);
+						}
+					}
+					if(castle.getGold() < 15000*castle.lvlWalls) GUI.Box (upgrade2Rect,"");
+					if(GUI.tooltip == "1") {
+						GUI.Box (tooltipRect, "Cost: " + (1000+(5000*numTowns)) +" gold");
+						GUI.Label(tooltipRect2, "The town will spawn soldiers and make money over time.");
+					}
+					else if(GUI.tooltip == "2") {
+						GUI.Box (tooltipRect, "Cost: " + 5000*castle.lvlWalls + " gold");
+						GUI.Label(tooltipRect2, "Your castle walls will be stronger. (+200Hp)");
+					}
+				break;
+				}
 			}
 		}
 		else {
-			switch (state) {
-			case State.Tower:
-				GUI.Box (guiRect, "TOWER");
-				GUI.Box (attrRect,"");
-				GUI.Label (attr1Rect, "Hp: ");
-				GUI.Label (attr2Rect, "Attack: " +" /s");
-				GUI.Box (upgradesRect,"");
-				if (GUI.Button (upgrade1Rect, new GUIContent ("Upgrade Tower", "1"))) {
-					if(castle.getGold() >= 2500) {
-						castle.addGold(-2500);
-					}
+			if(state== State.Win) {
+				GUI.Box (new Rect(0,0,Screen.width, Screen.height), "");
+				GUI.Box (new Rect((Screen.width-200)/2,(Screen.height-150)/2,200, 150),"YOU WIN!");
+				if (GUI.Button (new Rect((Screen.width-195)/2,(Screen.height-150)/2+95,193, 50), "Exit to Menu")){
+					Time.timeScale = 1;
+					Application.LoadLevel("menu");
 				}
-				if(castle.getGold() < 2500) GUI.Box (upgrade1Rect,"");
-				if(castle.getGold() < 1000+(5000)) GUI.Box (upgrade1Rect,"");
-				if (GUI.Button (upgrade2Rect, new GUIContent ("Destroy", "2"))){
-					if(castle.getGold() >= 5000) {
-						castle.addGold(-5000);
-					}
+			}
+			else if(state == State.Lose) {
+				GUI.Box (new Rect(0,0,Screen.width, Screen.height), "");
+				GUI.Box (new Rect((Screen.width-200)/2,(Screen.height-150)/2,200, 150),"YOU LOSE!");
+				if (GUI.Button (new Rect((Screen.width-195)/2,(Screen.height-150)/2+95,193, 50), "Exit to Menu")){
+					Time.timeScale = 1;
+					Application.LoadLevel("menu");
 				}
-				break;
-			case State.Town:
-				Town t = (Town)last.GetComponent ("Town");
-				GUI.Box (guiRect, "TOWN");
-				GUI.Box (attrRect,"");
-				GUI.Label (attr1Rect, "Size: "+ t.getHouses() + " houses");
-				GUI.Label (attr2Rect, "Income: "+ t.getIncome() +" gold/s");
-				GUI.Box (upgradesRect,"");
-				if (GUI.Button (upgrade1Rect, new GUIContent ("Upgrade Walls", "1"))) {
-					if(castle.getGold() >= 2500*(t.wallLevel+1)) {
-						castle.addGold(-2500*(t.wallLevel+1));
-						t.wallLevelUp ();
-					}
-				}
-				if(castle.getGold() < 2500*(t.wallLevel+1)) GUI.Box (upgrade1Rect,"");
-			    if (GUI.Button (upgrade2Rect, new GUIContent ("Repair", "2"))) {
-				if(castle.getGold() >= 500*t.getHousesDestroyed()) {
-						castle.addGold(-500*t.getHousesDestroyed());
-						t.rebuild();
-					}	
-				}
-				if(!t.needsRepairing || castle.getGold() <500*t.getHousesDestroyed()) GUI.Box (upgrade2Rect,"");
-				if(GUI.tooltip == "1") {
-				GUI.Box (tooltipRect, "Cost: " + 2500*(t.wallLevel+1) + " gold");
-					GUI.Label(tooltipRect2, "Your town walls will be upgraded. (+50Hp)");
-				}
-				else if(GUI.tooltip == "2") {
-					GUI.Box (tooltipRect, "Cost: " + 500*t.getHousesDestroyed() +" gold");
-					GUI.Label(tooltipRect2, "Repair all the destroyed houses in your town.");
-				}
-			break;
-			case State.Soldier: 
-				Pathfinding.SoldierAI sai = (Pathfinding.SoldierAI) last.GetComponent ("SoldierAI");
-				GUI.Box (guiRect, "SOLDIER");
-				GUI.Box (attrRect,"");
-				GUI.Label (attr1Rect, (sai.getLife()).ToString() + " / " + (sai.getTotalHP()).ToString());
-				GUI.Box (upgradesRect,"");
-				if (GUI.Button (upgrade1Rect, new GUIContent ("Build Tower", "1"))){}
-				if(GUI.tooltip == "1") {
-					GUI.Box (tooltipRect, "Cost: 200 gold");
-					GUI.Label(tooltipRect2, "The tower will shoot the enemies, but it needs a soldier inside");
-				}
-			break;
-			case State.Castle:
-				GUI.Box (guiRect, "CASTLE");
-				GUI.Box (attrRect,"");
-				GUI.Label (attr1Rect, "Hp: "+(castle.getLife()).ToString() + " / " + (castle.getTotalHP()).ToString());
-				GUI.Label (attr2Rect, "Income: "+(castle.getGoldPerSec()).ToString() + " gold/s");
-				GUI.Box (upgradesRect,"");
-				if (GUI.Button (upgrade1Rect, new GUIContent ("Build Town", "1"))){
-					if(castle.getGold() >= 1000+(5000*numTowns)) {
-						castle.addGold(-1000+(5000*numTowns));
-						construction = castle.buildTown();
-						state = State.Building;
-						Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-						construction.transform.position = new Vector3(pos.x, 0, pos.z);
-						++numTowns;
-					}
-				}
-				if(castle.getGold() < 1000+(5000*numTowns)) GUI.Box (upgrade1Rect,"");
-				if (GUI.Button (upgrade2Rect, new GUIContent ("Upgrade Walls", "2"))){
-					if(castle.getGold() >= 5000*castle.lvlWalls) {
-						castle.addGold(-5000*castle.lvlWalls);
-						castle.upgradeLife(200);
-					}
-				}
-				if(castle.getGold() < 15000*castle.lvlWalls) GUI.Box (upgrade2Rect,"");
-				if(GUI.tooltip == "1") {
-					GUI.Box (tooltipRect, "Cost: " + (1000+(5000*numTowns)) +" gold");
-					GUI.Label(tooltipRect2, "The town will spawn soldiers and make money over time.");
-				}
-				else if(GUI.tooltip == "2") {
-					GUI.Box (tooltipRect, "Cost: " + 5000*castle.lvlWalls + " gold");
-					GUI.Label(tooltipRect2, "Your castle walls will be stronger. (+200Hp)");
-				}
-			break;
 			}
 		}
 	}

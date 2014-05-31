@@ -48,7 +48,7 @@ public class GUIMenu : MonoBehaviour {
 			break;
 		case State.Start:
 			GUI.Label (text,"Choose the size of the map to begin!"); 
-			GUI.Button (buttonSmallMap, "Small Map");
+			if(GUI.Button (buttonSmallMap, "Small Map"))Application.LoadLevel("mapultrapeke");
 			if(GUI.Button (buttonBigMap, "Big Map")) Application.LoadLevel("mappeke");
 			if(GUI.Button (buttonBack, "Back")) state = State.Main;
 			break;
