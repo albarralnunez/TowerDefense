@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 public class GUIMouse : MonoBehaviour {
-	enum State {Town, Soldier, Castle ,Building, None};
+	enum State {Town, Soldier, Castle ,Building, Tower, None};
 
 	GameObject last, construction;
 	Rect guiRect = new Rect (0,0,140,140);
@@ -73,6 +73,10 @@ public class GUIMouse : MonoBehaviour {
 							last = (GameObject)hit.transform.parent.gameObject;
 							last.SendMessage("setHighlight", true);
 							state = State.Town;
+						}else if (hit.collider.tag == "Tower") {
+							last = (GameObject)hit.transform.gameObject;
+							last.SendMessage("setHighlight", true);
+							state = State.Tower;
 						} else if (hit.collider.tag == "BuildingFloor") {
 							last = (GameObject)hit.transform.parent.transform.parent.gameObject;
 							last.SendMessage("setHighlight", true);
@@ -132,6 +136,25 @@ public class GUIMouse : MonoBehaviour {
 		}
 		else {
 			switch (state) {
+			case State.Tower:
+				GUI.Box (guiRect, "TOWER");
+				GUI.Box (attrRect,"");
+				GUI.Label (attr1Rect, "Hp: ");
+				GUI.Label (attr2Rect, "Attack: " +" /s");
+				GUI.Box (upgradesRect,"");
+				if (GUI.Button (upgrade1Rect, new GUIContent ("Upgrade Tower", "1"))) {
+					if(castle.getGold() >= 2500) {
+						castle.addGold(-2500);
+					}
+				}
+				if(castle.getGold() < 2500) GUI.Box (upgrade1Rect,"");
+				if(castle.getGold() < 1000+(5000)) GUI.Box (upgrade1Rect,"");
+				if (GUI.Button (upgrade2Rect, new GUIContent ("Destroy", "2"))){
+					if(castle.getGold() >= 5000) {
+						castle.addGold(-5000);
+					}
+				}
+				break;
 			case State.Town:
 				Town t = (Town)last.GetComponent ("Town");
 				GUI.Box (guiRect, "TOWN");

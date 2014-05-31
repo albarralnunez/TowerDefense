@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
 namespace Pathfinding {
 		
 	public class WaveControll : MonoBehaviour {
@@ -17,24 +18,21 @@ namespace Pathfinding {
 	
 		void Update() {
 			livingCreatures = transform.childCount;
-			if (livingCreatures == 0 || waveOn) {
-				if (waitToWave <= _waveTime) {	
-					_waveTime = 0; //reset time
-					if (!waveOn){
-						InvokeRepeating("Spawn",0,5);
-						waveOn = true;
-					}
-					if (livingCreatures >= totalCreaturesPerWave) {
-						CancelInvoke();
-						waveOn = false;
-					}
-				}
-				else {
-		 	 		_waveTime += Time.deltaTime; 
-				}
+			if (waitToWave <= _waveTime && !waveOn) {	
+				_waveTime = 0; //reset time
+				waveOn = true;
+				InvokeRepeating("Spawn",0,waitTimeSpawnMinion);
 			}
+			else if (livingCreatures >= totalCreaturesPerWave) {
+				CancelInvoke();
+				waveOn = false;
+			}
+			else {
+				_waveTime += Time.deltaTime;
+			}
+
 		}
-	
+
 		void Spawn (){
 			for (int j = 0; j < spawnPoints.Length ; ++ j) {
 				GameObject go = (GameObject)Instantiate (yourCreature, spawnPoints[j].position, Quaternion.identity);
