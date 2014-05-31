@@ -61,7 +61,7 @@ public class Town : MonoBehaviour {
 		selectionHighlight.SetActive(false);
 		GameObject building = (GameObject) Instantiate(buildings[indx], new Vector3(transform.position.x-10, transform.position.y, transform.position.z-5), buildings[indx].transform.rotation);
 		building.transform.parent = transform;
-		AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO!
+//		AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO!
 		sideBuildings.Enqueue(building);
 		state = State.Building;
 		Building bld = (Building)building.GetComponent("Building");
@@ -106,7 +106,7 @@ public class Town : MonoBehaviour {
 						++numhouses;
 						GameObject building = (GameObject) Instantiate(buildings[b], new Vector3(pos.x, 0, pos.z), buildings[b].transform.rotation);
 						building.transform.parent = transform;
-						AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO:!!!
+						//AstarPath.active.UpdateGraphs (building.collider.bounds,5); //TODO:!!!
 						sideBuildings.Enqueue(building);
 						if(transform.childCount-2 > levelReq[level-1]) {
 							++level;

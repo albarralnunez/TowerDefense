@@ -125,7 +125,7 @@ namespace Pathfinding {
 			return tr.position;	
 		}
 
-		private Transform GetNearestTaggedObject(){
+		/*private Transform GetNearestTaggedObject(){
 			// and finally the actual process for finding the nearest object:
 			
 			float nearestDistanceSqr = Mathf.Infinity;
@@ -147,12 +147,12 @@ namespace Pathfinding {
 				return GameObject.Find("Target").transform;
 			}
 			return nearestObj;
-		}
+		}*/
 	
 		protected new void Update () {
 			healthBarPart.transform.position = new Vector3(transform.position.x, healthBar.transform.position.y, transform.position.z);
 			if (state == State.walk) {
-				target = GameObject.Find("Target").transform;
+				//if (target ==  )target = 
 				//Get velocity in world-space
 				Vector3 velocity;
 				if (canMove) {

@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class WaveControll : MonoBehaviour {
+
 	public int totalCreaturesPerWave = 6;
 	private int _wave = 1;
 	int livingCreatures = 0; 
