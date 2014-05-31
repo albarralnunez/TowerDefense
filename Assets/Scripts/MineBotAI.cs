@@ -69,19 +69,7 @@ namespace Pathfinding {
 			curLife = life;
 			attackTime = 0;
 			state = State.walk;
-			
-			//Prioritize the walking animation
-/*
-			anim["zombie_running_2"].layer = 10;
-			
-			//Play all animations
-			anim.Play ("zombie_running_2");
-			
-			//Setup awake animations properties
-			anim["zombie_runinng_2"].wrapMode = WrapMode.Clamp;
-			anim["zombie_runinng_2"].speed = 0;
-			anim["zombie_runinng_2"].normalizedTime = 1F;
-*/
+
 			target = GameObject.Find("Target").transform;
 
 			//Call Start in base script (AIPath)

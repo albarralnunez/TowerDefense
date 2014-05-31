@@ -14,10 +14,6 @@ namespace Pathfinding {
 		public float waitTimeSpawnMinion;
 		public bool waveOn = false;
 		private Path pathEnemyOne;
-		void Star() {
-			 pathEnemyOne = StartPath(transform.position , GameObject.Find("Target").transform)	
-		}
-	
 	
 		void Update() {
 			livingCreatures = transform.childCount;
