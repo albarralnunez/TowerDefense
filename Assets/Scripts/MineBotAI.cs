@@ -38,7 +38,7 @@ namespace Pathfinding {
 		/** Effect which will be instantiated when end of path is reached.
 		 * \see OnTargetReached */
 		public GameObject endOfPathEffect;
-
+		public GameObject healthBar;
 
 		public int life;
 		public int damage;
@@ -48,6 +48,8 @@ namespace Pathfinding {
 		private int curLife;
 		private float attackTime;
 		private GameObject attacker;
+		private GameObject healthBarPart;
+		private HealthBar hbar;
 
 		public void SetToFight(GameObject a) {
 			state = State.fight;
@@ -56,6 +58,14 @@ namespace Pathfinding {
 
 		public void hit(int damage) {
 			curLife -= damage;
+			healthBarPart.SetActive(true);
+			hbar.setHP((float)curLife/(float)life);
+			if(curLife<=0) {
+				Toolbox toolbox = Toolbox.Instance;
+				toolbox.EnemyBusy.Remove (gameObject.GetInstanceID ());
+				Destroy(healthBarPart);
+				Destroy (gameObject);
+			}
 		}
 
 		public int getTotalHP() {return life;}
@@ -63,6 +73,10 @@ namespace Pathfinding {
 		public int getLife() { return curLife;}
 
 		public new void Start () {
+			healthBarPart = (GameObject)Instantiate(healthBar, new Vector3(transform.position.x, healthBar.transform.position.y, transform.position.z), healthBar.transform.rotation);
+			healthBarPart.SetActive(false);
+			hbar = (HealthBar) healthBarPart.GetComponent("HealthBar");
+
 
 			curLife = life;
 			attackTime = 0;
@@ -136,6 +150,7 @@ namespace Pathfinding {
 		}
 	
 		protected new void Update () {
+			healthBarPart.transform.position = new Vector3(transform.position.x, healthBar.transform.position.y, transform.position.z);
 			if (state == State.walk) {
 				target = GameObject.Find("Target").transform;
 				//Get velocity in world-space
