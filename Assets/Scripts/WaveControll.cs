@@ -2,7 +2,6 @@
 using System.Collections;
 
 public class WaveControll : MonoBehaviour {
-
 	public int totalCreaturesPerWave = 15;
 	private int _wave = 1;
 	int livingCreatures = 0; 
@@ -12,15 +11,12 @@ public class WaveControll : MonoBehaviour {
 	public Transform[] spawnPoints;
 	public float waitTimeSpawnMinion;
 	public bool waveOn = false;
-	public int curWave = 0;
-	public int totalWaves = 10;
 
 	void Update() {
 		livingCreatures = transform.childCount;
 		if (waitToWave <= _waveTime && !waveOn) {	
 			_waveTime = 0; //reset time
 			waveOn = true;
-			++curWave;
 			InvokeRepeating("Spawn",0,waitTimeSpawnMinion);
 		}
 		else if (livingCreatures >= totalCreaturesPerWave) {

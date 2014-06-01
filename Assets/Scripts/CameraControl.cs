@@ -6,7 +6,7 @@ using System.Collections;
 public class CameraControl : MonoBehaviour {
 
 	public float edgeSensibility = 10f;
-	public 	Vector3 pos = new Vector3(-5,0,-490);
+
 	public float cameraVelocity = 7;
 	public float zoomVelocity = 50;
 	public float rotVelocity = 5;
@@ -16,9 +16,10 @@ public class CameraControl : MonoBehaviour {
 	
 	public Vector4 limits;
 	
+	public Vector3 pos = new Vector3(-5,0,-490);
 	Vector3 rot = new Vector3(70, 0, 0);
 	Vector2 pre = new Vector2(-1,-1);
-
+	
 	// Use this for initialization
 	void Start () {
 	}

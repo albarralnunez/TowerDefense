@@ -31,7 +31,7 @@ namespace Pathfinding {
 		public float distanceAlert = 20.0F;
 		/** Minimum velocity for moving */
 		public float sleepVelocity = 0.4F;
-		public GameObject blood;
+			
 		/** Speed relative to velocity with which to play animations */
 		//public float animationSpeed = 0.2F;
 		
@@ -40,9 +40,6 @@ namespace Pathfinding {
 		public GameObject endOfPathEffect;
 
 		public GameObject healthBar;
-		public GameObject body;
-
-
 		public int life;
 		public int damage;
 		public int attackSpeed;
@@ -53,11 +50,12 @@ namespace Pathfinding {
 		private GameObject attacker;
 		private GameObject healthBarPart;
 		private HealthBar hbar;
-
+		public Animator anim;
 		
 
 		public void SetToFight(GameObject a) {
 			state = State.fight;
+			anim.SetBool("Fight",true);
 			attacker = a;
 		}
 
@@ -66,12 +64,9 @@ namespace Pathfinding {
 			healthBarPart.SetActive(true);
 			hbar.setHP((float)curLife/(float)life);
 			if(curLife<=0) {
-				blood = (GameObject) Instantiate (blood, transform.position, blood.transform.rotation);
-				Destroy (blood,5);
 				Toolbox toolbox = Toolbox.Instance;
 				toolbox.EnemyBusy.Remove (gameObject.GetInstanceID ());
 				Destroy(healthBarPart);
-				Instantiate (body, transform.position, transform.rotation);
 				Destroy (gameObject);
 			}
 		}
@@ -157,7 +152,10 @@ namespace Pathfinding {
 			} 
 			else if (state == State.fight) {
 				attackTime += Time.deltaTime;
-				if (attacker  == null) state = State.walk;
+				if (attacker  == null) {
+					state = State.walk;
+					anim.SetBool("Fight",false);
+				}
 				else if (attackSpeed <= attackTime) {
 					attacker.SendMessage("hit",damage);
 					attackTime = 0;
@@ -182,7 +180,7 @@ namespace Pathfinding {
 
 		//a la ke choque con un soldier, un building o un castle lo atacara
 		void OnTriggerEnter(Collider col) {
-			if(col.tag == "Soldier"||col.tag=="Building" || col.tag == "Castle") {
+			if(col.tag=="Building" || col.tag == "Castle") {
 				SetToFight (col.gameObject);
 			}
 		}

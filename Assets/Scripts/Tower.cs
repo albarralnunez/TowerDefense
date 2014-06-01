@@ -13,7 +13,7 @@ public class Tower : MonoBehaviour {
 	private int curLife;
 	public float dps = 1.0f;
 	float count =0;
-	public int lvl = 0;
+	
 	public bool isDestroyed, isHit;
 	
 	HealthBar hbar;
@@ -32,7 +32,7 @@ public class Tower : MonoBehaviour {
 		curLife = life;
 	   
 		line = (LineRenderer) gameObject.GetComponent("LineRenderer");
-		line.SetPosition(0, new Vector3(transform.position.x+10, 10, transform.position.z+5));
+		line.SetPosition(0, new Vector3(transform.position.x+10, 5, transform.position.z+5));
 		line.enabled = false;
 
 		healthBarPart = (GameObject)Instantiate(healthBar, new Vector3(transform.position.x+10, healthBar.transform.position.y, transform.position.z+5), healthBar.transform.rotation);
@@ -76,12 +76,6 @@ public class Tower : MonoBehaviour {
 		}
 	}
 
-	public void levelUp() {
-		++lvl;
-		life += 50;
-		dmg += 10;
-	}
-
 	public void setHighlight(bool active) {
 		transform.FindChild("Highlight").gameObject.renderer.enabled = active;
 	}
@@ -121,8 +115,7 @@ public class Tower : MonoBehaviour {
 
 	void attack() {
 		if(enemyAttacking == null)  {
-			CancelInvoke();	
-			Invoke ("disableLine", 0.05f);
+			CancelInvoke();		
 			attacking = false;
 			enemyAttacking = null;
 		}
@@ -140,20 +133,11 @@ public class Tower : MonoBehaviour {
 
 	void StopAttackEnemy(GameObject enemy) {
 		if(enemy.transform == enemyAttacking.transform) {
-			CancelInvoke();	
-			Invoke ("disableLine", 0.05f);
+			CancelInvoke();		
 			attacking = false;
 			enemyAttacking = null;
 		}
 	}	
-
-	public int getLife() {
-		return curLife;
-	}
-
-	public int getHP() {
-		return life;
-	}
 }
 
 

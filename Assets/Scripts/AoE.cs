@@ -3,7 +3,7 @@ using System.Collections;
 
 public class AoE : MonoBehaviour {
 
-	void OnTriggerStay(Collider col) {
+	void OnTriggerEnter(Collider col) {
 		if(col.tag == "Enemy") transform.parent.SendMessage("AttackEnemy", col.gameObject);
 	}
 
