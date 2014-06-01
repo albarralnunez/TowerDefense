@@ -114,7 +114,7 @@ public class Tower : MonoBehaviour {
 	void AttackEnemy(GameObject enemy) {
 		if(!attacking) {
 			enemyAttacking = enemy;
-			InvokeRepeating("attack", 0, dps);
+			InvokeRepeating("attack", dps, dps);
 			attacking = true;
 		}
 	}
@@ -139,11 +139,13 @@ public class Tower : MonoBehaviour {
 	}
 
 	void StopAttackEnemy(GameObject enemy) {
-		if(enemy.transform == enemyAttacking.transform) {
-			CancelInvoke();	
-			Invoke ("disableLine", 0.05f);
-			attacking = false;
-			enemyAttacking = null;
+		if(enemyAttacking!= null) {
+			if(enemy.transform == enemyAttacking.transform) {
+				CancelInvoke();	
+				Invoke ("disableLine", 0.05f);
+				attacking = false;
+				enemyAttacking = null;
+			}
 		}
 	}	
 

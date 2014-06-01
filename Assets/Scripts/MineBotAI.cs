@@ -71,7 +71,7 @@ namespace Pathfinding {
 				Toolbox toolbox = Toolbox.Instance;
 				toolbox.EnemyBusy.Remove (gameObject.GetInstanceID ());
 				Destroy(healthBarPart);
-				Instantiate (body, transform.position, transform.rotation);
+				Instantiate (body, transform.position, body.transform.rotation);
 				Destroy (gameObject);
 			}
 		}

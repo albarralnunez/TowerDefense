@@ -3,9 +3,9 @@ using System.Collections;
 
 public class colliderSoldier : MonoBehaviour {
 
-	public void OnTrigerEnter(Collider a) {
+	void OnTriggerEnter(Collider a) {
 		if (a.tag == "Enemy") {
-			gameObject.transform.parent.FindChild("SoldierObj").SendMessage("SetToFight", a.gameObject);
+			gameObject.transform.parent.SendMessage("SetToFight", a.gameObject);
 		}
 	}
 
